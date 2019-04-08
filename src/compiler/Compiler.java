@@ -1,8 +1,10 @@
 package compiler;
 
+import java.io.IOException;
+
 public class Compiler {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		if (args.length != 1) { // EXCEPTION
 			System.out.println("ERRO: Arquivo não foi encontrado...");

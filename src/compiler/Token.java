@@ -2,13 +2,20 @@ package compiler;
 
 public class Token {
 	private TokenType type;
-	private String lexema;
-	private int lin;
-	private int col;
-	
-	public Token(TokenType type, String lexema) {
+	private String lexeme;
+	private long lin;
+	private long col;
+
+	public Token(TokenType type, String lexeme, long lin, long col){
 		this.type = type;
-		this.lexema = lexema;
+		this.lexeme = lexeme;
+		this.lin = lin;
+		this.col = col;
+	}
+
+	public Token(TokenType type, String lexeme) {
+		this.type = type;
+		this.lexeme = lexeme;
 	}
 	
 	public TokenType getType() {
@@ -17,22 +24,36 @@ public class Token {
 	public void setType(TokenType type) {
 		this.type = type;
 	}
-	public String getLexema() {
-		return lexema;
+	public String getLexeme() {
+		return lexeme;
 	}
-	public void setLexema(String lexema) {
-		this.lexema = lexema;
+	public void setLexeme(String lexeme) {
+		this.lexeme = lexeme;
 	}
-	public int getLin() {
+	public long getLin() {
 		return lin;
 	}
-	public void setLin(int lin) {
+	public void setLin(long lin) {
 		this.lin = lin;
 	}
-	public int getCol() {
+	public long getCol() {
 		return col;
 	}
-	public void setCol(int col) {
+	public void setCol(long col) {
 		this.col = col;
+	}
+
+	public void printToken() {
+		System.out.println(this.toString());
+	}
+
+	@Override
+	public String toString() {
+		return ("  Token:" + this.getType()
+				+ "  Lexema:" + this.getLexeme()
+				+ "  Linha:" + this.getLin()
+				+ "  Coluna:" + this.getCol()
+				+ "\n-----------------------------------------------------------");
+
 	}
 }
