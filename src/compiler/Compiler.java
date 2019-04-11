@@ -18,7 +18,7 @@ import java.io.IOException;
 public class Compiler {
 
 	public static void main(String[] args) throws IOException {
-		// String file = "/‎⁨MacintoshHD\\Users\\joaopedroporto⁩\\Documents⁩\\Development⁩\\git⁩\\compiler\\file.txt⁩";
+		// String file = "~joaopedroporto⁩/Documents⁩/Development⁩/git⁩/compiler/file.txt⁩";
 		if (args.length != 1) { // EXCEPTION
 			System.out.println("ERRO: Arquivo não foi encontrado...");
 			return;
