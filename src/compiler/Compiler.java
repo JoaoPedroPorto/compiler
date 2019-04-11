@@ -2,6 +2,7 @@ package compiler;
 
 import java.io.IOException;
 
+
 /*
  * 
  * Arabianos
@@ -18,7 +19,6 @@ import java.io.IOException;
 public class Compiler {
 
 	public static void main(String[] args) throws IOException {
-		// String file = "~joaopedroporto⁩/Documents⁩/Development⁩/git⁩/compiler/file.txt⁩";
 		if (args.length != 1) { // EXCEPTION
 			System.out.println("ERRO: Arquivo não foi encontrado...");
 			return;
