@@ -1,12 +1,25 @@
 package compiler;
 
+/*
+ * 
+ * Arabianos
+ * 
+ * Rafaela Penteado da Cunha
+ * João Pedro Porto
+ * Diego Fortunato
+ * Ulisses Maia
+ * João Matos
+ * Daniel Dos Anjos Barros
+ *
+ */
+
 public class Token {
 	private TokenType type;
 	private String lexeme;
 	private long lin;
 	private long col;
 
-	public Token(TokenType type, String lexeme, long lin, long col){
+	public Token(TokenType type, String lexeme, long lin, long col) {
 		this.type = type;
 		this.lexeme = lexeme;
 		this.lin = lin;
@@ -49,11 +62,11 @@ public class Token {
 
 	@Override
 	public String toString() {
-		return ("  Token:" + this.getType()
-				+ "  Lexema:" + this.getLexeme()
-				+ "  Linha:" + this.getLin()
-				+ "  Coluna:" + this.getCol()
-				+ "\n-----------------------------------------------------------");
+		return (" Token: " + this.getType()
+				+ "  Lexema: " + this.getLexeme()
+				+ "  Linha: " + this.getLin()
+				+ "  Coluna: " + this.getCol()
+				+ "\n-----------------------------------------------------------\n");
 
 	}
 }

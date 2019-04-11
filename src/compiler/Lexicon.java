@@ -3,8 +3,22 @@ package compiler;
 import java.io.EOFException;
 import java.io.IOException;
 
+/*
+ * 
+ * Arabianos
+ * 
+ * Rafaela Penteado da Cunha
+ * João Pedro Porto
+ * Diego Fortunato
+ * Ulisses Maia
+ * João Matos
+ * Daniel Dos Anjos Barros
+ *
+ */
+
 public class Lexicon {
 
+	@SuppressWarnings("unused")
 	private String fileName;
 	private FileLoader fLoader;
 	private StringBuilder lexeme;
@@ -25,14 +39,16 @@ public class Lexicon {
 		line = fLoader.getLine();
 		column = fLoader.getColumn();
 
-		try{
+		// CASO SEJA O FIM DO ARQUIVO, RETORNA TOKEN EOF
+		try {
 			character = fLoader.getNextChar();
-
-		}catch (Exception ex){
+		} catch (Exception ex) {
 			return  token_EOF();
 		}
 
-
+		// VERIFICA SE O CARACTER GERADO CONTER ESPACO
+		// CASO SEJA ELE PEDE NOVO TOKEN ATE QUE ESSA CONDICAO NAO SEJA MAIS VERDADE
+		// TAMBEM RETORNA TOKEN EOF CASO O PROXIMO TOKEN SEJA O FIM DO ARQUIVO
 		while (Character.isWhitespace(character)) {
 			try {
 				character = fLoader.getNextChar();
@@ -41,6 +57,7 @@ public class Lexicon {
 			}
 		}
 
+		// VERIFICA O CARACTER OBTIDO E RETONA O TOKEN GERADO AO FINAL, CASO O MESMO SEJA UM CARACTER VALIDO
 		switch (character) {
 			case '+':
 				lexeme.append(character);
@@ -93,7 +110,7 @@ public class Lexicon {
 					break;
 				}
 				lexeme.append(character);
-				errors.addErro("Caracter invalido", lexeme.toString(), line, column);
+				errors.addErro("Caracter inválido: ", lexeme.toString(), line, column);
 				this.nextToken();
 		}
 		return token;
@@ -103,49 +120,41 @@ public class Lexicon {
 		lexeme.append(character);
 		try {
 			while (true) {
-
 				character = fLoader.getNextChar();
-
 				if (character == '\'') {
 					lexeme.append(character);
 					return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
 				}
 				lexeme.append(character);
 			}
-
 		} catch (EOFException e) {
 			lexeme.append(character);
-			errors.addErro("Finalizado durante literal, faltando fechar aspa.", lexeme.toString(), line, column);
+			errors.addErro("Finalizado durante literal, faltando fechar aspas.", lexeme.toString(), line, column);
 			return token_EOF();
 		}
 	}
 
-	private Token process_ID() throws IOException{
+	private Token process_ID() throws IOException {
 		lexeme.append(character);
 		try {
-
 			while (true) {
-
 				character = fLoader.getNextChar();
-
 				if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
 					fLoader.resetLastChar();
 					return tabSymbols.addID(lexeme.toString(), line, column);
 				}
-					lexeme.append(character);
+				lexeme.append(character);
 			}
 		} catch (EOFException e) {
 			return tabSymbols.addID(lexeme.toString(), line, column);
-
 		}
 	}
 
-	private Token process_NUM_INT() throws IOException{
+	private Token process_NUM_INT() throws IOException {
 		lexeme.append(character);
 		try {
 			while (true) {
 				character = fLoader.getNextChar();
-
 				if (!Character.isDigit(character)) {
 					if (character == '.') {
 						return process_NUM_FLOAT();
@@ -164,14 +173,12 @@ public class Lexicon {
 	private Token process_NUM_FLOAT() throws IOException {
 		lexeme.append(character);
 		try {
-
 			while (true) {
 				character = fLoader.getNextChar();
-
 				if (!Character.isDigit(character)) {
 					if (character == '.') {
 						lexeme.append(character);
-						errors.addErro("Caracter invalido, ponto ja informado no numero float.", lexeme.toString(), line, column);
+						errors.addErro("Caracter inválido, ponto já	 informado no número float.", lexeme.toString(), line, column);
 						return this.nextToken();
 					}
 					fLoader.resetLastChar();
@@ -179,7 +186,6 @@ public class Lexicon {
 				} else {
 					lexeme.append(character);
 				}
-
 			}
 		} catch (EOFException e) {
 			return new Token(TokenType.NUM_FLOAT, lexeme.toString(), line, column);
@@ -189,21 +195,18 @@ public class Lexicon {
 	private Token process_ATTRIB() throws IOException {
 		lexeme.append(character);
 		try {
-
 			character = fLoader.getNextChar();
-
 			if (character == '-') {
 				lexeme.append(character);
 				return  new Token(TokenType.ATTRIB, lexeme.toString(), line, column);
 			} else {
 				lexeme.append(character);
-				errors.addErro("Caracter invalido.", lexeme.toString(), line, column);
+				errors.addErro("Caracter inválido.", lexeme.toString(), line, column);
 				return this.nextToken();
-
 			}
 		} catch (Exception e) {
 			lexeme.append(character);
-			errors.addErro("Finizalidado durante atribuição.", lexeme.toString(), line, column);
+			errors.addErro("Finalizado durante atribuição.", lexeme.toString(), line, column);
 			return token_EOF();
 		}
 	}
@@ -213,35 +216,31 @@ public class Lexicon {
 		try {
 			while (true) {
 				character = fLoader.getNextChar();
-
-				if (((character == '<' || character == '>' || character == '=') && (lexeme.charAt(lexeme.length() - 1) == '&'))
-						||
-						((character == '=') && ((lexeme.charAt(lexeme.length() - 1) == '<') || (lexeme.charAt(lexeme.length() - 1) == '>')))
-						||
-						((character == '>') && (lexeme.charAt(lexeme.length() - 1) == '<'))
-				) {
+				if (((character == '<' || character == '>' || character == '=') && (lexeme.charAt(lexeme.length() - 1) == '&')) ||
+						((character == '=') && ((lexeme.charAt(lexeme.length() - 1) == '<') || (lexeme.charAt(lexeme.length() - 1) == '>'))) ||
+						((character == '>') && (lexeme.charAt(lexeme.length() - 1) == '<'))) {
 					lexeme.append(character);
-				} else if ((character == '&') && (lexeme.charAt(lexeme.length() - 1) == '<' || lexeme.charAt(lexeme.length() - 1) == '>' || lexeme.charAt(lexeme.length() - 1) == '=')) {
+				} else if ((character == '&') &&
+						(lexeme.charAt(lexeme.length() - 1) == '<' ||
+						lexeme.charAt(lexeme.length() - 1) == '>' ||
+						lexeme.charAt(lexeme.length() - 1) == '=')) {
 					lexeme.append(character);
 					return new Token(TokenType.RELOP, lexeme.toString(), line, column);
-
 				} else {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para relacionamento.", lexeme.toString(), line, column);
+					errors.addErro("Caracter inválido para relacionamento.", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 			}
 		} catch (EOFException e) {
 			errors.addErro("finalizado durante relacionamento de operação", lexeme.toString(), line, column);
 			return token_EOF();
-
 		}
 	}
 
-	private void ignoreComments() throws IOException{
+	private void ignoreComments() throws IOException {
 		character = fLoader.getNextChar();
 		try {
-
 			if (character == '{') {
 				while (true) {
 					character = fLoader.getNextChar();
@@ -253,17 +252,16 @@ public class Lexicon {
 							fLoader.resetLastChar();
 						}
 					}
-
 				}
-
 			} else {
-				errors.addErro("Caracter invalido, esperado {.", "comentarios", line, column);
+				errors.addErro("Caracter inválido, esperado {.", "comentários", line, column);
 			}
 		} catch (EOFException e) {
-			errors.addErro("Finalizado durante durante declaracao de comentario", "comentarios", line, column);
+			errors.addErro("Finalizado durante declaração de comentário", "comentários", line, column);
 		}
 	}
 
+	// RETORNA UM TOKEN DE FIM DE ARQUIVO
 	private Token token_EOF(){
 		return tabSymbols.addID("EOF", line, column);
 	}

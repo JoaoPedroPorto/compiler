@@ -1,5 +1,18 @@
 package compiler;
 
+/*
+ * 
+ * Arabianos
+ * 
+ * Rafaela Penteado da Cunha
+ * João Pedro Porto
+ * Diego Fortunato
+ * Ulisses Maia
+ * João Matos
+ * Daniel Dos Anjos Barros
+ *
+ */
+
 public enum TokenType {
 	NUM_INT,
 	NUM_FLOAT,

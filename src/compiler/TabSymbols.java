@@ -3,6 +3,19 @@ package compiler;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * 
+ * Arabianos
+ * 
+ * Rafaela Penteado da Cunha
+ * João Pedro Porto
+ * Diego Fortunato
+ * Ulisses Maia
+ * João Matos
+ * Daniel Dos Anjos Barros
+ *
+ */
+
 public class TabSymbols {
 	
 	private static TabSymbols instance = new TabSymbols();
@@ -10,8 +23,7 @@ public class TabSymbols {
 	
 	private TabSymbols() {
 		table = new HashMap<String, Token>();
-		
-		// Pre-carrega palavras reservadas
+		// PRE-CARREGA PALAVRAS RESERVADAS
 		table.put("+", new Token(TokenType.ADDSUB, "+"));
 		table.put("-", new Token(TokenType.ADDSUB, "-"));
 		table.put("*", new Token(TokenType.MULTDIV, "*"));
@@ -39,18 +51,20 @@ public class TabSymbols {
 		table.put("declare", new Token(TokenType.DECLARE, "declare"));
 		table.put("to", new Token(TokenType.TO, "to"));
 		table.put("EOF", new Token(TokenType.EOF, "EOF"));
-		// ...
 	}
 	
 	public static TabSymbols getInstance() {
 		return instance;
 	}
 	
+	
+	// CHAMADA PELO ANALISADOR LEXICO PARA ADICIONAR UM ID
 	public Token addID(String lexeme, long lin, long col) {
 		Token token = table.get(lexeme);
+		// CASO TOKEN NAO EXISTA NA TABELA DE SIMBOLOS ELE E CONSIDERADO UM ID
 		if (token == null) {
-			// Entao este token eh um ID
 			token = new Token(TokenType.ID, lexeme);
+			// ADICIONA NA TABELA DE SIMBOLOS
 			table.put(token.getLexeme(), token);
 		}
 		token.setCol(col);
@@ -58,9 +72,10 @@ public class TabSymbols {
 		return token;
 	}
 
+	// FUNCAO RESPONSAVEL POR PRINTAR NA TELA TODOS OS SIMBOLOS
 	public void printTabSymbols() {
 		System.out.println(" ----------------------------------------------------------");
-		System.out.println("|                  Tabela de Simbolos                      |");
+		System.out.println("|                  Tabela de Símbolos                      |");
 		System.out.println(" ----------------------------------------------------------");
 
 		for (Token token : table.values()) {
