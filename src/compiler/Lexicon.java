@@ -93,10 +93,10 @@ public class Lexicon {
 			case '&':
 				token = process_RELOP();
 				break;
-			case '\'':
+			case '\"':
 				token = process_LITERAL();
 				break;
-			case '#':
+			case '{':
 				ignoreComments();
 				token = this.nextToken();
 				break;
@@ -121,7 +121,7 @@ public class Lexicon {
 		try {
 			while (true) {
 				character = fLoader.getNextChar();
-				if (character == '\'') {
+				if (character == '\"') {
 					lexeme.append(character);
 					return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
 				}
@@ -153,18 +153,58 @@ public class Lexicon {
 	private Token process_NUM_INT() throws IOException {
 		lexeme.append(character);
 		try {
-			while (true) {
+			char lastCharacter;
+			boolean validaE = true;
+			boolean validaPlus = true;
+			int contadorE= 0;
+			int contadorPlus = 0;
+			boolean codicao = true;
+			while (codicao) {
+				lastCharacter = character;
 				character = fLoader.getNextChar();
-				if (!Character.isDigit(character)) {
+				if (!Character.isDigit(character) && character!= 'E' && character != '+') {
 					if (character == '.') {
 						return process_NUM_FLOAT();
 					}
 					fLoader.resetLastChar();
-					return  new Token(TokenType.NUM_INT, lexeme.toString(), line, column);
+					if(contadorE > 1 || contadorPlus > 1 || validaE == false || validaPlus == false){
+						lexeme.append(character);
+						errors.addErro("Caracter inválido, formato de numero cientifico incorreto", lexeme.toString(), line, column);
+						codicao = false;
+						return  this.nextToken();
+					}
+					return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);
+
 				} else {
+
+					if(character == 'E' && Character.isDigit(lastCharacter)){
+						contadorE++;
+					}
+					if(character == '+' && lastCharacter == 'E'){
+						char numero = fLoader.getNextChar();
+						if(Character.isDigit(numero)){
+							fLoader.resetLastChar();
+							contadorPlus++;
+
+						}
+						else{
+							validaPlus = false;
+						}
+					}
+					if(character == 'E' && !Character.isDigit(lastCharacter)){
+						validaE = false;
+					}
+					if(character == '+' && lastCharacter != 'E'){
+						validaPlus = false;
+					}
+
+
 					lexeme.append(character);
+
 				}
 			}
+
+			return  this.nextToken();
 		} catch (EOFException e) {
 			return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);
 		}
@@ -173,17 +213,62 @@ public class Lexicon {
 	private Token process_NUM_FLOAT() throws IOException {
 		lexeme.append(character);
 		try {
+			char lastCharacterFloat;
+			boolean validaFloatE = true;
+			boolean validaFloatPlus = true;
+			boolean validaFloatVirgula = true;
+			int contadorFloatE= 0;
+			int contadorFloatPlus = 0;
+			int contatorFloatVirgula = 0;
 			while (true) {
+				lastCharacterFloat = character;
 				character = fLoader.getNextChar();
-				if (!Character.isDigit(character)) {
+				if (!Character.isDigit(character) && character != ',' && character != 'E' && character != '+') {
 					if (character == '.') {
 						lexeme.append(character);
 						errors.addErro("Caracter inválido, ponto já	 informado no número float.", lexeme.toString(), line, column);
 						return this.nextToken();
 					}
 					fLoader.resetLastChar();
+					if(contadorFloatE > 1 || contadorFloatPlus > 1 || contatorFloatVirgula > 1 || validaFloatE == false || validaFloatPlus == false || validaFloatVirgula == false){
+						lexeme.append(character);
+						errors.addErro("Caracter inválido, formato de numero cientifico com ponto flutuante incorreto", lexeme.toString(), line, column);
+						return  this.nextToken();
+					}
 					return new Token(TokenType.NUM_FLOAT, lexeme.toString(), line, column);
 				} else {
+					if(character == 'E' && Character.isDigit(lastCharacterFloat)){
+						contadorFloatE++;
+					}
+					if(character == '+' && lastCharacterFloat == 'E'){
+						char proximonumero = fLoader.getNextChar();
+						if(Character.isDigit(proximonumero)){
+							fLoader.resetLastChar();
+							contadorFloatPlus++;
+						}
+						else{
+							validaFloatPlus = false;
+						}
+					}
+					if(character == ',' &&  Character.isDigit(lastCharacterFloat)){
+						char proximonumero = fLoader.getNextChar();
+						if(Character.isDigit(proximonumero)){
+							fLoader.resetLastChar();
+							contadorFloatPlus++;
+
+						}
+						else{
+							validaFloatVirgula = false;
+						}
+					}
+
+					if(character == 'E' && !Character.isDigit(lastCharacterFloat)){
+						validaFloatE = false;
+					}
+					if(character == '+' && lastCharacterFloat != 'E'){
+						validaFloatPlus = false;
+					}
+
 					lexeme.append(character);
 				}
 			}
@@ -198,7 +283,7 @@ public class Lexicon {
 			character = fLoader.getNextChar();
 			if (character == '-') {
 				lexeme.append(character);
-				return  new Token(TokenType.ATTRIB, lexeme.toString(), line, column);
+				return  new Token(TokenType.ASSIGN, lexeme.toString(), line, column);
 			} else {
 				lexeme.append(character);
 				errors.addErro("Caracter inválido.", lexeme.toString(), line, column);
@@ -214,7 +299,7 @@ public class Lexicon {
 	private Token process_RELOP() throws IOException {
 		lexeme.append(character);
 		try {
-			while (true) {
+			 while (true) {
 				character = fLoader.getNextChar();
 				if (((character == '<' || character == '>' || character == '=') && (lexeme.charAt(lexeme.length() - 1) == '&')) ||
 						((character == '=') && ((lexeme.charAt(lexeme.length() - 1) == '<') || (lexeme.charAt(lexeme.length() - 1) == '>'))) ||
@@ -241,20 +326,20 @@ public class Lexicon {
 	private void ignoreComments() throws IOException {
 		character = fLoader.getNextChar();
 		try {
-			if (character == '{') {
+			if (character == '#') {
 				while (true) {
 					character = fLoader.getNextChar();
-					if (character == '}') {
+					if (character == '#') {
 						character = fLoader.getNextChar();
-						if (character == '#') {
-							break;
+							if (character == '}') {
+								break;
 						} else {
 							fLoader.resetLastChar();
 						}
 					}
 				}
 			} else {
-				errors.addErro("Caracter inválido, esperado {.", "comentários", line, column);
+				errors.addErro("formatado inválido, esperado {# #}.", "comentários", line, column);
 			}
 		} catch (EOFException e) {
 			errors.addErro("Finalizado durante declaração de comentário", "comentários", line, column);

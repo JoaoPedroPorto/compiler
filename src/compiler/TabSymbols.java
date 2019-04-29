@@ -24,11 +24,11 @@ public class TabSymbols {
 	private TabSymbols() {
 		table = new HashMap<String, Token>();
 		// PRE-CARREGA PALAVRAS RESERVADAS
-		table.put("+", new Token(TokenType.ADDSUB, "+"));
-		table.put("-", new Token(TokenType.ADDSUB, "-"));
-		table.put("*", new Token(TokenType.MULTDIV, "*"));
-		table.put("/", new Token(TokenType.MULTDIV, "/"));
-		table.put(";", new Token(TokenType.ATTRIB, ";"));
+		table.put("+", new Token(TokenType.ARIT_AS, "+"));
+		table.put("-", new Token(TokenType.ARIT_AS, "-"));
+		table.put("*", new Token(TokenType.ARIT_MD, "*"));
+		table.put("/", new Token(TokenType.ARIT_MD, "/"));
+		table.put(";", new Token(TokenType.TERM, ";"));
 		table.put("(", new Token(TokenType.L_PAR, "("));
 		table.put(")", new Token(TokenType.R_PAR, ")"));
 		table.put("true", new Token(TokenType.LOGIC_VAL, "true"));
@@ -36,11 +36,13 @@ public class TabSymbols {
 		table.put("and", new Token(TokenType.LOGIC_OP, "and"));
 		table.put("not", new Token(TokenType.LOGIC_OP, "not"));
 		table.put("or", new Token(TokenType.LOGIC_OP, "or"));
-		table.put("logic", new Token(TokenType.TYPE, "logic"));
+		table.put("bool", new Token(TokenType.TYPE, "bool"));
 		table.put("text", new Token(TokenType.TYPE, "text"));
+		table.put("int", new Token(TokenType.TYPE, "int"));
+		table.put("float", new Token(TokenType.TYPE, "float"));
 		table.put("num", new Token(TokenType.TYPE, "num"));
 		table.put("program", new Token(TokenType.PROGRAM, "program"));
-		table.put("endprog", new Token(TokenType.END_PROG, "endprog"));
+		table.put("end_prog", new Token(TokenType.END_PROG, "end_rog"));
 		table.put("begin", new Token(TokenType.BEGIN, "begin"));
 		table.put("end", new Token(TokenType.END, "end"));
 		table.put("if", new Token(TokenType.IF, "if"));
