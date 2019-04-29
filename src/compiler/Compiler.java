@@ -19,13 +19,12 @@ import java.io.IOException;
 public class Compiler {
 
 	public static void main(String[] args) throws IOException {
-	/*	if (args.length != 1) { // EXCEPTION
+		if (args.length != 1) { // EXCEPTION
 			System.out.println("ERRO: Arquivo não foi encontrado...");
 			return;
-		}*/
-	String file = "C:\\git\\Compliler\\compiler\\file.txt";
+		}
 		// CHAMA O ANALISADOR SINTATICO PASSADO O ARQUIVO A SER ANALISADO
-		Syntactic syntactic = new Syntactic(file);
+		Syntactic syntactic = new Syntactic(args[0]);
 		// CHAMA A FUNCAO DE PROCESSAR DO ANALISADOR SINTATICO
 		syntactic.process();
 	}

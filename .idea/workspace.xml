@@ -2,21 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa2cffb5-620e-47d7-a6ea-429c3839b3b2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/compiler/Compiler.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Compiler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/ErrorHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/ErrorHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/ErrorReport.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/ErrorReport.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/FileLoader.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/FileLoader.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/Lexicon.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Lexicon.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/Syntactic.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Syntactic.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/TabSymbols.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/TabSymbols.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/Token.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Token.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/compiler/TokenType.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/TokenType.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/file.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/Compiler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/Compiler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/Lexicon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/Lexicon.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/TabSymbols.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/TabSymbols.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/TokenType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/TokenType.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/compiler/Compiler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="29" selection-start-line="29" selection-end-line="29" />
+            <state relative-caret-position="282">
+              <caret line="21" column="4" lean-forward="true" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -57,11 +44,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/Lexicon.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="387">
-              <caret line="318" column="14" lean-forward="true" selection-start-line="318" selection-start-column="14" selection-end-line="318" selection-end-column="14" />
+              <caret line="318" column="13" lean-forward="true" selection-start-line="318" selection-start-column="13" selection-end-line="318" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#10118#10119#0" expanded="true" />
@@ -150,10 +137,10 @@
         <option value="$PROJECT_DIR$/src/compiler/ErrorHandler.java" />
         <option value="$PROJECT_DIR$/src/compiler/ErrorReport.java" />
         <option value="$PROJECT_DIR$/src/compiler/Token.java" />
-        <option value="$PROJECT_DIR$/src/compiler/Compiler.java" />
         <option value="$PROJECT_DIR$/src/compiler/TokenType.java" />
         <option value="$PROJECT_DIR$/src/compiler/TabSymbols.java" />
         <option value="$PROJECT_DIR$/src/compiler/Lexicon.java" />
+        <option value="$PROJECT_DIR$/src/compiler/Compiler.java" />
       </list>
     </option>
   </component>
@@ -245,18 +232,18 @@
       <updated>1554571009490</updated>
       <workItem from="1554571012975" duration="6480000" />
       <workItem from="1554674883258" duration="10105000" />
-      <workItem from="1556492385519" duration="6547000" />
+      <workItem from="1556492385519" duration="6795000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23132000" />
+    <option name="totallyTimeSpent" value="23380000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.52398723" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.52398723" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -346,13 +333,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/compiler/Compiler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="29" selection-start-line="29" selection-end-line="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/compiler/TabSymbols.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -363,12 +343,19 @@
     <entry file="file://$PROJECT_DIR$/src/compiler/Lexicon.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="387">
-          <caret line="318" column="14" lean-forward="true" selection-start-line="318" selection-start-column="14" selection-end-line="318" selection-end-column="14" />
+          <caret line="318" column="13" lean-forward="true" selection-start-line="318" selection-start-column="13" selection-end-line="318" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#10118#10119#0" expanded="true" />
             <element signature="e#10169#10170#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/compiler/Compiler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="282">
+          <caret line="21" column="4" lean-forward="true" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
         </state>
       </provider>
     </entry>
