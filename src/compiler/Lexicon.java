@@ -90,7 +90,7 @@ public class Lexicon {
 				lexeme.append(character);
 				token = tabSymbols.addID(lexeme.toString(), line, column);
 				break;
-			case '&':
+			case '$':
 				token = process_RELOP();
 				break;
 			case '\"':
@@ -295,30 +295,41 @@ public class Lexicon {
 			return token_EOF();
 		}
 	}
-
+	
 	private Token process_RELOP() throws IOException {
 		lexeme.append(character);
 		try {
 			 while (true) {
 				character = fLoader.getNextChar();
-				if (((character == '<' || character == '>' || character == '=') && (lexeme.charAt(lexeme.length() - 1) == '&')) ||
-						((character == '=') && ((lexeme.charAt(lexeme.length() - 1) == '<') || (lexeme.charAt(lexeme.length() - 1) == '>'))) ||
-						((character == '>') && (lexeme.charAt(lexeme.length() - 1) == '<'))) {
+				if ((character == 'l' || character == 'g' || character == 'e' || character == 'd') && (lexeme.charAt(lexeme.length() - 1) == '$')) {
 					lexeme.append(character);
-				} else if ((character == '&') &&
-						(lexeme.charAt(lexeme.length() - 1) == '<' ||
-						lexeme.charAt(lexeme.length() - 1) == '>' ||
-						lexeme.charAt(lexeme.length() - 1) == '=')) {
+				} else if ((character == 't' || character == 'e' || character == 'q' || character == 'f') 
+						&& (lexeme.charAt(lexeme.length() - 1) == 'l' || lexeme.charAt(lexeme.length() - 1) == 'g' || 
+							lexeme.charAt(lexeme.length() - 1) == 'e' || lexeme.charAt(lexeme.length() - 1) == 'd')) {
+					if ((character == 't' || character == 'e')
+							&& (lexeme.charAt(lexeme.length() - 1) != 'l' && lexeme.charAt(lexeme.length() - 1) != 'g')) {
+						lexeme.append(character);
+						errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+						return this.nextToken();
+					} else if (character == 'q' && lexeme.charAt(lexeme.length() - 1) != 'e') {
+						lexeme.append(character);
+						errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+						return this.nextToken();
+					} else if (character == 'f' && lexeme.charAt(lexeme.length() - 1) != 'd') {
+						lexeme.append(character);
+						errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+						return this.nextToken();
+					}
 					lexeme.append(character);
 					return new Token(TokenType.RELOP, lexeme.toString(), line, column);
 				} else {
 					lexeme.append(character);
-					errors.addErro("Caracter inválido para relacionamento.", lexeme.toString(), line, column);
+					errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 			}
 		} catch (EOFException e) {
-			errors.addErro("finalizado durante relacionamento de operação", lexeme.toString(), line, column);
+			errors.addErro("finalizado durante relacionamento de operação logica", lexeme.toString(), line, column);
 			return token_EOF();
 		}
 	}

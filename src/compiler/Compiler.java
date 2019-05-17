@@ -1,6 +1,10 @@
 package compiler;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 
 /*
@@ -19,12 +23,13 @@ import java.io.IOException;
 public class Compiler {
 
 	public static void main(String[] args) throws IOException {
-		if (args.length != 1) { // EXCEPTION
+		Path path = Paths.get((!Application.PLATFORM.equals(PlatformEnum.WINDOWS)) ? File.FILE_LINUX : File.FILE_WINDOWS);
+		if (!Files.exists(path)) { // EXCEPTION
 			System.out.println("ERRO: Arquivo não foi encontrado...");
 			return;
 		}
 		// CHAMA O ANALISADOR SINTATICO PASSADO O ARQUIVO A SER ANALISADO
-		Syntactic syntactic = new Syntactic(args[0]);
+		Syntactic syntactic = new Syntactic(path.toString());
 		// CHAMA A FUNCAO DE PROCESSAR DO ANALISADOR SINTATICO
 		syntactic.process();
 	}
