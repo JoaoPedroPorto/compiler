@@ -33,16 +33,20 @@ public class ErrorHandler {
 
     // PRINTA MENSAGEM QUE NAO HA ERROS OU LISTA OS ERROS GERADOS
     public void errorReport() {
-        if (listErros == null || listErros.isEmpty() || listErros.size() == 0) {
-            System.out.println("Nenhum erro foi encontrado no processamento!");
+        if (listErros == null || listErros.isEmpty()) {
+            System.out.println("Nenhum erro foi encontrado no processamento...");
             return;
         }
-        System.out.println(" ---------------------------------------------------------");
-        System.out.println("|                      ERROS GERADOS                      |");
-        System.out.println(" ---------------------------------------------------------");
-        System.out.println("\n");
+        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("                                                                   ERROS GERADOS                                                                   ");
+        System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%5s %15s %20s %50s", "#", "POS(x,y)", "LEXEMA", "MENSAGEM");
+        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
+        int i = 1;
         for (ErrorReport error : listErros) {
-            System.out.println(error.toString());
+        	System.out.format("%5s %15s %20s %100s",i, "(" + error.getLine() + ", " + error.getColumn() + ")", error.getLexeme(), error.getDescription());
+            System.out.println("\n\n#-------------------------------------------------------------------------------------------------------------------------------------------------#\n");
+            i++;
         }
     }
     

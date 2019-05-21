@@ -42,7 +42,7 @@ public class TabSymbols {
 		table.put("float", new Token(TokenType.TYPE, "float"));
 		table.put("num", new Token(TokenType.TYPE, "num"));
 		table.put("program", new Token(TokenType.PROGRAM, "program"));
-		table.put("end_prog", new Token(TokenType.END_PROG, "end_rog"));
+		table.put("end_prog", new Token(TokenType.END_PROG, "end_prog"));
 		table.put("begin", new Token(TokenType.BEGIN, "begin"));
 		table.put("end", new Token(TokenType.END, "end"));
 		table.put("if", new Token(TokenType.IF, "if"));
@@ -77,12 +77,16 @@ public class TabSymbols {
 
 	// FUNCAO RESPONSAVEL POR PRINTAR NA TELA TODOS OS SIMBOLOS
 	public void printTabSymbols() {
-		System.out.println(" ----------------------------------------------------------");
-		System.out.println("|                  Tabela de Símbolos                      |");
-		System.out.println(" ----------------------------------------------------------");
-
+		System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("                                                                   TABELA DE SIMBOLOS                                                                   ");
+        System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%5s %25s %50s", "#", "POS(x,y)", "LEXEMA");
+        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
+        int i = 1;
 		for (Token token : table.values()) {
-			System.out.println(token.getLexeme());
+			System.out.format("%5s %25s %50s",i, "(" + token.getLin() + ", " + token.getCol() + ")", token.getLexeme());
+            System.out.println("\n\n#-------------------------------------------------------------------------------------------------------------------------------------------------#\n");
+            i++;
 		}
 	}
 

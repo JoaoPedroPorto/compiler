@@ -31,43 +31,31 @@ public class ErrorReport {
         this.column = column;
     }
 
-    private String getDescription() {
+    // GETTERS AND SETTERS
+    
+    public String getDescription() {
         return description;
     }
-    @SuppressWarnings("unused")
-	private void setDescription(String description) {
+	public void setDescription(String description) {
         this.description = description;
     }
-    private String getLexeme() {
+    public String getLexeme() {
         return lexeme;
     }
-    @SuppressWarnings("unused")
-	private void setLexeme(String lexeme) {
+	public void setLexeme(String lexeme) {
         this.lexeme = lexeme;
     }
-    private long getLine() {
+    public long getLine() {
         return line;
     }
-    @SuppressWarnings("unused")
-	private void setLine(long line) {
+	public void setLine(long line) {
         this.line = line;
     }
     public long getColumn() {
         return column;
     }
-    @SuppressWarnings("unused")
-	private void setColumn(long column) {
+	public void setColumn(long column) {
         this.column = column;
-    }
-
-    @Override
-    public String toString() {
-        return ("Descricao: " + this.getDescription() + "\n" +
-                "Lexema: " + this.getLexeme() + "\n" +
-                "Linha: " + this.getLine() + "\n" +
-                "Coluna: " + this.getColumn() + "\n" +
-                "-----------------------------------------------------------\n");
-
     }
 
 }

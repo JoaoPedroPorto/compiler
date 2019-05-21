@@ -31,6 +31,8 @@ public class Token {
 		this.lexeme = lexeme;
 	}
 	
+	// GETTERS AND SETTERS
+	
 	public TokenType getType() {
 		return type;
 	}
@@ -56,17 +58,9 @@ public class Token {
 		this.col = col;
 	}
 
-	public void printToken() {
-		System.out.println(this.toString());
+	public void printToken(int id) {
+		System.out.format("%5s %15s %20s %80s",id, "(" + this.getLin() + ", " + this.getCol() + ")", this.getLexeme(), this.getType());
+		System.out.println("\n\n#-------------------------------------------------------------------------------------------------------------------------------------------------#\n");
 	}
 
-	@Override
-	public String toString() {
-		return (" Token: " + this.getType()
-				+ "  Lexema: " + this.getLexeme()
-				+ "  Linha: " + this.getLin()
-				+ "  Coluna: " + this.getCol()
-				+ "\n-----------------------------------------------------------\n");
-
-	}
 }

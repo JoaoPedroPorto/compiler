@@ -124,7 +124,7 @@ public class Lexicon {
 			boolean hasLiteral = false;
 			if (lexeme.charAt(lexeme.length() - 1) == '\'') {
 				lexeme.append(character);
-				errors.addErro("Caracter invalido para literal. Caractere ' \' ' nao e aceito para literal", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal: Caractere' \' ' nao e aceito para literal.", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
 			do {
@@ -137,7 +137,7 @@ public class Lexicon {
 				return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
 			}
 			lexeme.append(character);
-			errors.addErro("Caracter invalido para literal. Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
+			errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
 			return this.nextToken();
 		} catch (EOFException e) {
 			lexeme.append(character);
@@ -159,7 +159,7 @@ public class Lexicon {
 				if (character == '_' && 
 						(Character.isLetter(lexeme.charAt(lexeme.length() - 1)) || Character.isDigit(lexeme.charAt(lexeme.length() - 1)))) {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para id. Encontrado letra antes de '_'.", lexeme.toString(), line, column);
+					errors.addErro("Erro ID: Encontrado letra antes de '_'.", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				lexeme.append(character);
@@ -211,12 +211,12 @@ public class Lexicon {
 				}
 				if (character == 'E' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countE != 0)) {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico inteiro. Espera digito antes do caracter 'E' ou possue mais de um caracter 'E'.", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Inteiro: Espera 'digito' antes do 'E' ou possue mais de um 'E'.", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				if (character == '+' && (lexeme.charAt(lexeme.length() - 1) != 'E' || countPlus != 0)) {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico inteiro. Espera caracter 'E' antes do simbolo '+' ou possue mais de um caracter '+'", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Inteiro: Espera 'E' antes do '+' ou possue mais de um '+'", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				if (character == 'E')
@@ -237,7 +237,7 @@ public class Lexicon {
 		try {
 			if (lexeme.charAt(lexeme.length() - 1) == ',') {
 				lexeme.append(character);
-				errors.addErro("Caracter invalido para literal numerico decimal. Espera '.', mas contem ','.", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal Numerico Decimal: Espera '.', mas contem ','.", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
 			lexeme.append(character);
@@ -248,22 +248,22 @@ public class Lexicon {
 				character = fLoader.getNextChar();
 				if (character == ',') {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico decimal. Espera '.', mas contem ','.", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Decimal: Espera '.', mas contem ','.", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				if (character == 'E' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countE != 0)) {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico decimal. Espera digito antes do caracter 'E' ou possue mais de um caracter 'E'.", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' antes do 'E' ou possue mais de um 'E'.", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				if (character == '+' && (lexeme.charAt(lexeme.length() - 1) != 'E' || countPlus != 0)) {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico decimal. Espera caracter 'E' antes do simbolo '+' ou possue mais de um caracter '+'", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Decimal: Espera 'E' antes do '+' ou possue mais de um '+'", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				if (character == '.' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countPoint > 1)) {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico decimal. Espera digito antes do '.' ou ja possui '.'", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' antes do '.' ou ja possui '.'", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 				if (character == 'E')
@@ -288,7 +288,7 @@ public class Lexicon {
 			character = fLoader.getNextChar();
 			if (character != '-') {
 				lexeme.append(character);
-				errors.addErro("Caracter invalido para atribuicao. Espera caracter '-'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Atribuicao: Espera '-'.", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
 			lexeme.append(character);
@@ -310,27 +310,27 @@ public class Lexicon {
 					if ((character == 't' || character == 'e')
 							&& (lexeme.charAt(lexeme.length() - 1) != 'l' && lexeme.charAt(lexeme.length() - 1) != 'g')) {
 						lexeme.append(character);
-						errors.addErro("Caracter inválido para operador logico. Espera [ 'l', 'g' ].", lexeme.toString(), line, column);
+						errors.addErro("Erro Operador Logico: Espera [ 'l', 'g' ].", lexeme.toString(), line, column);
 						return this.nextToken();
 					} else if (character == 'q' && lexeme.charAt(lexeme.length() - 1) != 'e') {
 						lexeme.append(character);
-						errors.addErro("Caracter inválido para operador logico. Espera [ 'e' ].", lexeme.toString(), line, column);
+						errors.addErro("Erro Operador Logico: Espera [ 'e' ].", lexeme.toString(), line, column);
 						return this.nextToken();
 					} else if (character == 'f' && lexeme.charAt(lexeme.length() - 1) != 'd') {
 						lexeme.append(character);
-						errors.addErro("Caracter inválido para operador logico. Espera [ 'd' ].", lexeme.toString(), line, column);
+						errors.addErro("Erro Operador Logico: Espera [ 'd' ].", lexeme.toString(), line, column);
 						return this.nextToken();
 					}
 					lexeme.append(character);
 					return new Token(TokenType.RELOP, lexeme.toString(), line, column);
 				} else {
 					lexeme.append(character);
-					errors.addErro("Caracter invalido para operador logico. Espera [ 't', 'e', 'q', 'f' ]", lexeme.toString(), line, column);
+					errors.addErro("Erro Operador Logico: Espera [ 't', 'e', 'q', 'f' ]", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
 			} else {
 				lexeme.append(character);
-				errors.addErro("Caracter invalido para operador logico. Espera [ 'l', 'g', 'e', 'd' ].", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g', 'e', 'd' ].", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
 		} catch (EOFException e) {
@@ -340,25 +340,31 @@ public class Lexicon {
 	}
 
 	private void ignoreComments() throws IOException {
-		character = fLoader.getNextChar();
 		try {
-			if (character == '#') {
-				while (true) {
-					character = fLoader.getNextChar();
-					if (character == '#') {
-						character = fLoader.getNextChar();
-							if (character == '}') {
-								break;
-						} else {
-							fLoader.resetLastChar();
-						}
-					}
-				}
-			} else {
-				errors.addErro("formatado inválido, esperado {# #}.", "comentários", line, column);
+			character = fLoader.getNextChar();
+			boolean hasFence = false;
+			if (character != '#') {
+				errors.addErro("Erro Comentario: Espera {# #}.", "comentarios", line, column);
+				return;
 			}
+			do {
+				character = fLoader.getNextChar();
+				if (character == '#')
+					hasFence = true;
+				lexeme.append(character);
+			} while(character != '#');
+			if (hasFence) {
+				character = fLoader.getNextChar();
+				if (character == '}') {
+					return;
+				}
+				fLoader.resetLastChar();
+				errors.addErro("Erro Comentario: Espera {# #}.", "comentarios", line, column);
+			}
+			fLoader.resetLastChar();
+			errors.addErro("Erro Comentario: Espera {# #}.", "comentarios", line, column);
 		} catch (EOFException e) {
-			errors.addErro("Finalizado durante declaração de comentário", "comentários", line, column);
+			errors.addErro("Finalizado durante validacao de comentario", "comentarios", line, column);
 		}
 	}
 
