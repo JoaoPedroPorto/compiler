@@ -76,7 +76,7 @@ public class Lexicon {
 				token = tabSymbols.addID(lexeme.toString(), line, column);
 				break;
 			case '<':
-				token = process_ATTRIB();
+				token = processAssign();
 				break;
 			case ';':
 				lexeme.append(character);
@@ -91,10 +91,13 @@ public class Lexicon {
 				token = tabSymbols.addID(lexeme.toString(), line, column);
 				break;
 			case '$':
-				token = process_RELOP();
+				token = processRelop();
 				break;
 			case '\"':
-				token = process_LITERAL();
+				token = processLiteral();
+				break;
+			case '\'':
+				token = processLiteral();
 				break;
 			case '{':
 				ignoreComments();
@@ -102,11 +105,11 @@ public class Lexicon {
 				break;
 			default:
 				if (Character.isDigit(character)) {
-					token = process_NUM_INT();
+					token = processNumInt();
 					break;
 				}
 				if (Character.isLetter(character) || character == '_') {
-					token = process_ID();
+					token = processId();
 					break;
 				}
 				lexeme.append(character);
@@ -115,26 +118,67 @@ public class Lexicon {
 		}
 		return token;
 	}
-
-	private Token process_LITERAL() throws IOException {
-		lexeme.append(character);
+	private Token processLiteral() throws IOException {
 		try {
-			while (true) {
-				character = fLoader.getNextChar();
-				if (character == '\"') {
-					lexeme.append(character);
-					return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
-				}
+			lexeme.append(character);
+			boolean hasLiteral = false;
+			if (lexeme.charAt(lexeme.length() - 1) == '\'') {
 				lexeme.append(character);
+				errors.addErro("Caracter invalido para literal. Caractere ' \' ' nao e aceito para literal", lexeme.toString(), line, column);
+				return this.nextToken();
 			}
+			do {
+				character = fLoader.getNextChar();
+				if (character == '\"')
+					hasLiteral = true;
+			} while(character != '\"');
+			if (hasLiteral) {
+				lexeme.append(character);
+				return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
+			}
+			lexeme.append(character);
+			errors.addErro("Caracter invalido para literal. Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
+			return this.nextToken();
 		} catch (EOFException e) {
 			lexeme.append(character);
-			errors.addErro("Finalizado durante literal, faltando fechar aspas.", lexeme.toString(), line, column);
+			errors.addErro("Finalizado durante validacao de literal. Problema: " + e.getMessage(), lexeme.toString(), line, column);
+			return token_EOF();
+		}
+	}
+	
+	private Token processId() throws IOException {
+		try {
+			lexeme.append(character);
+			boolean hasId = true;
+			do {
+				character = fLoader.getNextChar();
+				if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
+					hasId = false;
+					break;
+				}
+				if (character == '_' && 
+						(Character.isLetter(lexeme.charAt(lexeme.length() - 1)) || Character.isDigit(lexeme.charAt(lexeme.length() - 1)))) {
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para id. Encontrado letra antes de '_'.", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				lexeme.append(character);
+			} while(Character.isLetter(character) || Character.isDigit(character) || character == '_');
+			fLoader.resetLastChar();
+			if (hasId) {
+				return tabSymbols.addID(lexeme.toString(), line, column);
+			}
+			lexeme.append(character);
+			errors.addErro("Caracter invalido para id.", lexeme.toString(), line, column);
+			return this.nextToken();
+		} catch (EOFException e) {
+			lexeme.append(character);
+			errors.addErro("Finalizado durante validacao de Id. Problema: " + e.getMessage(), lexeme.toString(), line, column);
 			return token_EOF();
 		}
 	}
 
-	private Token process_ID() throws IOException {
+	/*private Token process_ID() throws IOException {
 		lexeme.append(character);
 		try {
 			while (true) {
@@ -148,188 +192,149 @@ public class Lexicon {
 		} catch (EOFException e) {
 			return tabSymbols.addID(lexeme.toString(), line, column);
 		}
-	}
-
-	private Token process_NUM_INT() throws IOException {
-		lexeme.append(character);
+	}*/
+	
+	private Token processNumInt() throws IOException {
 		try {
-			char lastCharacter;
-			boolean validaE = true;
-			boolean validaPlus = true;
-			int contadorE= 0;
-			int contadorPlus = 0;
-			boolean codicao = true;
-			while (codicao) {
-				lastCharacter = character;
-				character = fLoader.getNextChar();
-				if (!Character.isDigit(character) && character!= 'E' && character != '+') {
-					if (character == '.') {
-						return process_NUM_FLOAT();
-					}
-					fLoader.resetLastChar();
-					if(contadorE > 1 || contadorPlus > 1 || validaE == false || validaPlus == false){
-						lexeme.append(character);
-						errors.addErro("Caracter inválido, formato de numero cientifico incorreto", lexeme.toString(), line, column);
-						codicao = false;
-						return  this.nextToken();
-					}
-					return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);
-
-				} else {
-
-					if(character == 'E' && Character.isDigit(lastCharacter)){
-						contadorE++;
-					}
-					if(character == '+' && lastCharacter == 'E'){
-						char numero = fLoader.getNextChar();
-						if(Character.isDigit(numero)){
-							fLoader.resetLastChar();
-							contadorPlus++;
-
-						}
-						else{
-							validaPlus = false;
-						}
-					}
-					if(character == 'E' && !Character.isDigit(lastCharacter)){
-						validaE = false;
-					}
-					if(character == '+' && lastCharacter != 'E'){
-						validaPlus = false;
-					}
-
-
-					lexeme.append(character);
-
-				}
-			}
-
-			return  this.nextToken();
-		} catch (EOFException e) {
-			return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);
-		}
-	}
-
-	private Token process_NUM_FLOAT() throws IOException {
-		lexeme.append(character);
-		try {
-			char lastCharacterFloat;
-			boolean validaFloatE = true;
-			boolean validaFloatPlus = true;
-			boolean validaFloatVirgula = true;
-			int contadorFloatE= 0;
-			int contadorFloatPlus = 0;
-			int contatorFloatVirgula = 0;
-			while (true) {
-				lastCharacterFloat = character;
-				character = fLoader.getNextChar();
-				if (!Character.isDigit(character) && character != ',' && character != 'E' && character != '+') {
-					if (character == '.') {
-						lexeme.append(character);
-						errors.addErro("Caracter inválido, ponto já	 informado no número float.", lexeme.toString(), line, column);
-						return this.nextToken();
-					}
-					fLoader.resetLastChar();
-					if(contadorFloatE > 1 || contadorFloatPlus > 1 || contatorFloatVirgula > 1 || validaFloatE == false || validaFloatPlus == false || validaFloatVirgula == false){
-						lexeme.append(character);
-						errors.addErro("Caracter inválido, formato de numero cientifico com ponto flutuante incorreto", lexeme.toString(), line, column);
-						return  this.nextToken();
-					}
-					return new Token(TokenType.NUM_FLOAT, lexeme.toString(), line, column);
-				} else {
-					if(character == 'E' && Character.isDigit(lastCharacterFloat)){
-						contadorFloatE++;
-					}
-					if(character == '+' && lastCharacterFloat == 'E'){
-						char proximonumero = fLoader.getNextChar();
-						if(Character.isDigit(proximonumero)){
-							fLoader.resetLastChar();
-							contadorFloatPlus++;
-						}
-						else{
-							validaFloatPlus = false;
-						}
-					}
-					if(character == ',' &&  Character.isDigit(lastCharacterFloat)){
-						char proximonumero = fLoader.getNextChar();
-						if(Character.isDigit(proximonumero)){
-							fLoader.resetLastChar();
-							contadorFloatPlus++;
-
-						}
-						else{
-							validaFloatVirgula = false;
-						}
-					}
-
-					if(character == 'E' && !Character.isDigit(lastCharacterFloat)){
-						validaFloatE = false;
-					}
-					if(character == '+' && lastCharacterFloat != 'E'){
-						validaFloatPlus = false;
-					}
-
-					lexeme.append(character);
-				}
-			}
-		} catch (EOFException e) {
-			return new Token(TokenType.NUM_FLOAT, lexeme.toString(), line, column);
-		}
-	}
-
-	private Token process_ATTRIB() throws IOException {
-		lexeme.append(character);
-		try {
-			character = fLoader.getNextChar();
-			if (character == '-') {
-				lexeme.append(character);
-				return  new Token(TokenType.ASSIGN, lexeme.toString(), line, column);
-			} else {
-				lexeme.append(character);
-				errors.addErro("Caracter inválido.", lexeme.toString(), line, column);
-				return this.nextToken();
-			}
-		} catch (Exception e) {
 			lexeme.append(character);
-			errors.addErro("Finalizado durante atribuição.", lexeme.toString(), line, column);
+			int countE = 0;
+			int countPlus = 0;
+			do {
+				character = fLoader.getNextChar();
+				if (!Character.isDigit(character) && character != 'E' && character != '+') {
+					if (character == '.' || character == ',')
+						return processNumFloat();
+					fLoader.resetLastChar();
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para literal numerico inteiro.", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == 'E' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countE != 0)) {
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para literal numerico inteiro. Espera digito antes do caracter 'E' ou possue mais de um caracter 'E'.", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == '+' && (lexeme.charAt(lexeme.length() - 1) != 'E' || countPlus != 0)) {
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para literal numerico inteiro. Espera caracter 'E' antes do simbolo '+' ou possue mais de um caracter '+'", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == 'E')
+					countE ++;
+				else if (character == '+')
+					countPlus ++;
+				lexeme.append(character);
+			} while(character == '.' || Character.isDigit(character) || character == 'E' || character == '+' || character == ',');
+			lexeme.append(character);
+			return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);	
+		} catch (EOFException e) {
+			errors.addErro("Finalizado durante validacao de literal numerico inteiro. Problema: " + e.getMessage(), lexeme.toString(), line, column);
 			return token_EOF();
 		}
 	}
 	
-	private Token process_RELOP() throws IOException {
-		lexeme.append(character);
+	private Token processNumFloat() throws IOException {
 		try {
-			 while (true) {
+			if (lexeme.charAt(lexeme.length() - 1) == ',') {
+				lexeme.append(character);
+				errors.addErro("Caracter invalido para literal numerico decimal. Espera '.', mas contem ','.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
+			lexeme.append(character);
+			int countE = 0;
+			int countPlus = 0;
+			int countPoint = 1;
+			do {
 				character = fLoader.getNextChar();
-				if ((character == 'l' || character == 'g' || character == 'e' || character == 'd') && (lexeme.charAt(lexeme.length() - 1) == '$')) {
+				if (character == ',') {
 					lexeme.append(character);
-				} else if ((character == 't' || character == 'e' || character == 'q' || character == 'f') 
-						&& (lexeme.charAt(lexeme.length() - 1) == 'l' || lexeme.charAt(lexeme.length() - 1) == 'g' || 
-							lexeme.charAt(lexeme.length() - 1) == 'e' || lexeme.charAt(lexeme.length() - 1) == 'd')) {
+					errors.addErro("Caracter invalido para literal numerico decimal. Espera '.', mas contem ','.", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == 'E' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countE != 0)) {
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para literal numerico decimal. Espera digito antes do caracter 'E' ou possue mais de um caracter 'E'.", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == '+' && (lexeme.charAt(lexeme.length() - 1) != 'E' || countPlus != 0)) {
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para literal numerico decimal. Espera caracter 'E' antes do simbolo '+' ou possue mais de um caracter '+'", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == '.' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countPoint > 1)) {
+					lexeme.append(character);
+					errors.addErro("Caracter invalido para literal numerico decimal. Espera digito antes do '.' ou ja possui '.'", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				if (character == 'E')
+					countE ++;
+				else if (character == '+')
+					countPlus ++;
+				else if (character == '.')
+					countPoint ++;
+				lexeme.append(character);
+			} while(character == '.' || Character.isDigit(character) || character == 'E' || character == '+' || character == ',');
+			lexeme.append(character);
+			return new Token(TokenType.NUM_FLOAT, lexeme.toString(), line, column);
+		} catch (EOFException e) {
+			errors.addErro("Finalizado durante validacao de literal numerico decimal. Problema: " + e.getMessage(), lexeme.toString(), line, column);
+			return token_EOF();
+		}
+	}
+	
+	private Token processAssign() throws IOException {
+		try {
+			lexeme.append(character);
+			character = fLoader.getNextChar();
+			if (character != '-') {
+				lexeme.append(character);
+				errors.addErro("Caracter invalido para atribuicao. Espera caracter '-'.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
+			lexeme.append(character);
+			return  new Token(TokenType.ASSIGN, lexeme.toString(), line, column);
+		} catch (Exception e) {
+			errors.addErro("Finalizado durante atribuicao. Problema: " + e.getMessage(), lexeme.toString(), line, column);
+			return token_EOF();
+		}
+	}
+
+	private Token processRelop() throws IOException {
+		try {
+			lexeme.append(character);
+			character = fLoader.getNextChar();
+			if ((character == 'l' || character == 'g' || character == 'e' || character == 'd')) {
+				lexeme.append(character);
+				character = fLoader.getNextChar();
+				if (character == 't' || character == 'e' || character == 'q' || character == 'f') {
 					if ((character == 't' || character == 'e')
 							&& (lexeme.charAt(lexeme.length() - 1) != 'l' && lexeme.charAt(lexeme.length() - 1) != 'g')) {
 						lexeme.append(character);
-						errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+						errors.addErro("Caracter inválido para operador logico. Espera [ 'l', 'g' ].", lexeme.toString(), line, column);
 						return this.nextToken();
 					} else if (character == 'q' && lexeme.charAt(lexeme.length() - 1) != 'e') {
 						lexeme.append(character);
-						errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+						errors.addErro("Caracter inválido para operador logico. Espera [ 'e' ].", lexeme.toString(), line, column);
 						return this.nextToken();
 					} else if (character == 'f' && lexeme.charAt(lexeme.length() - 1) != 'd') {
 						lexeme.append(character);
-						errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+						errors.addErro("Caracter inválido para operador logico. Espera [ 'd' ].", lexeme.toString(), line, column);
 						return this.nextToken();
 					}
 					lexeme.append(character);
 					return new Token(TokenType.RELOP, lexeme.toString(), line, column);
 				} else {
 					lexeme.append(character);
-					errors.addErro("Caracter inválido para operador logico.", lexeme.toString(), line, column);
+					errors.addErro("Caracter invalido para operador logico. Espera [ 't', 'e', 'q', 'f' ]", lexeme.toString(), line, column);
 					return this.nextToken();
 				}
+			} else {
+				lexeme.append(character);
+				errors.addErro("Caracter invalido para operador logico. Espera [ 'l', 'g', 'e', 'd' ].", lexeme.toString(), line, column);
+				return this.nextToken();
 			}
 		} catch (EOFException e) {
-			errors.addErro("finalizado durante relacionamento de operação logica", lexeme.toString(), line, column);
+			errors.addErro("Finalizado durante validacao de operação logica. Problema: " + e.getMessage(), lexeme.toString(), line, column);
 			return token_EOF();
 		}
 	}

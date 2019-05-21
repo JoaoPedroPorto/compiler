@@ -52,6 +52,7 @@ public class TabSymbols {
 		table.put("while", new Token(TokenType.WHILE, "while"));
 		table.put("declare", new Token(TokenType.DECLARE, "declare"));
 		table.put("to", new Token(TokenType.TO, "to"));
+		table.put("<-", new Token(TokenType.ASSIGN, "<-"));
 		table.put("EOF", new Token(TokenType.EOF, "EOF"));
 	}
 	
