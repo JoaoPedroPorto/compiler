@@ -28,6 +28,7 @@ public class Lexicon {
 	private Token token;
 	private TabSymbols tabSymbols = TabSymbols.getInstance();
 	private ErrorHandler errors = ErrorHandler.getInstance();
+	private Token buffer;
 
 	public Lexicon(String fileName) throws IOException {
 		this.fileName = fileName;
@@ -338,6 +339,11 @@ public class Lexicon {
 			return token_EOF();
 		}
 	}
+	
+	public void storeToken(Token token) {
+		this.buffer = token; 
+	}
+	
 
 	private void ignoreComments() throws IOException {
 		try {
