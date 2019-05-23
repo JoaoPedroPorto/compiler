@@ -105,7 +105,7 @@ public class Syntactic {
 	}
 	
 	public void derivaAtrib() throws IOException {
-Token token = lexicon.nextToken();
+		Token token = lexicon.nextToken();
 		
 		if (token.getType() != TokenType.ID)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
@@ -299,7 +299,7 @@ Token token = lexicon.nextToken();
 		} else if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-		} else if (token.getType() == TokenType.RELOP)
+		} else if (token.getType() != TokenType.RELOP)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
@@ -400,7 +400,7 @@ Token token = lexicon.nextToken();
 		if (token.getType() == TokenType.ID || token.getType() == TokenType.DECLARE || token.getType() == TokenType.IF || token.getType() == TokenType.FOR || token.getType() == TokenType.WHILE) {
 			lexicon.storeToken(token);
 			derivaCmd();
-		} else if (token.getType() == TokenType.BEGIN)
+		} else if (token.getType() != TokenType.BEGIN)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 
