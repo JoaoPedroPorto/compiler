@@ -105,13 +105,16 @@ public class Syntactic {
 	}
 	
 	public void derivaAtrib() throws IOException {
+Token token = lexicon.nextToken();
 		
+		if (token.getType() != TokenType.ID)
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
 	public void derivaDecl() throws IOException {
 		Token token = lexicon.nextToken();
 		
-		if (token.getType() == TokenType.DECLARE)
+		if (token.getType() != TokenType.DECLARE)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
@@ -131,14 +134,14 @@ public class Syntactic {
 			if (token.getType() != TokenType.DECLARE || token.getType() != TokenType.IF || token.getType() != TokenType.FOR || token.getType() != TokenType.WHILE ||
 					token.getType() != TokenType.ID || token.getType() != TokenType.END || token.getType() != TokenType.END_PROG || token.getType() != TokenType.ELSE)		
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
 	}
-}
 	
 	public void derivaExp() throws IOException {
 		Token token = lexicon.nextToken();
 		
 		if (token.getType() != TokenType.LOGIC_VAL || token.getType() != TokenType.ID || token.getType() != TokenType.NUM_INT || token.getType() != TokenType.NUM_FLOAT ||
-				token.getType() != TokenType.LITERAL)		
+				token.getType() != TokenType.LITERAL || token.getType() != TokenType.L_PAR)		
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
@@ -147,7 +150,7 @@ public class Syntactic {
 		
 		if (token.getType() == TokenType.LOGIC_OP) {
 			lexicon.storeToken(token);
-			derivaEValLog();
+			derivaFValLog();
 		} else if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
 			lexicon.storeToken(token);
 			derivaOpNum();
@@ -292,16 +295,15 @@ public class Syntactic {
 		
 		if (token.getType() == TokenType.LOGIC_OP) {
 			lexicon.storeToken(token);
-			derivaEValLog();
+			derivaFValLog();
 		} else if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-			derivaExpNum();
 		} else if (token.getType() == TokenType.RELOP)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	public void derivaEValLog() throws IOException {
+	public void derivaFValLog() throws IOException {
 		Token token = lexicon.nextToken();
 		
 		if (token == null) {
@@ -310,7 +312,7 @@ public class Syntactic {
 			if (token.getType() != TokenType.TERM || token.getType() != TokenType.R_PAR)	{	
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			}
-		} else if (token.getType() != TokenType.LOGIC_VAL)
+		} else if (token.getType() != TokenType.LOGIC_OP)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
@@ -335,7 +337,7 @@ public class Syntactic {
 	public void derivaOpNum() throws IOException {
 		Token token = lexicon.nextToken();
 		
-		if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD)
+		if (token.getType() != TokenType.ARIT_AS || token.getType() != TokenType.ARIT_MD)
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
