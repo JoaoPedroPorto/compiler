@@ -20,6 +20,6 @@ package compiler;
  */
 public class Application {
 	
-	public static PlatformEnum PLATFORM = PlatformEnum.MACOS;
+	public static PlatformEnum PLATFORM = PlatformEnum.WINDOWS;
 
 }

@@ -45,10 +45,17 @@ public class Syntactic {
 			// PRINTA O TOKEN GERADO
 			token.printToken(id);
 		}
+		
+		processDerivas();
+		
 		// PRINTA A TABELA DE SIMBOLOS
 		TabSymbols.getInstance().printTabSymbols();
 		// PRINTA OS ERROS GERADOS NA VERIFICACAO, CASO HAJA
 		ErrorHandler.getInstance().errorReport();
+	}
+	
+	public void processDerivas() {
+		
 	}
 	
 	public void derivaS() throws IOException {
