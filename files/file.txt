@@ -1,25 +1,5 @@
- {# comentario #}
-10+
-10E+10E
-100.00,00
+a for
 
-100.00E+10
-100.00E+10E
-4.8, 3.10E+10
-end_prog
-;
-<-
-*
-/
+___budega_absurda_234
 
-_id
-"oi"
-HELLO
-while
-#kjsjkds
-10005 50.8
-,
-'teste'
-( 
-)*-+;
-$ga
+34

@@ -1,0 +1,25 @@
+ {# comentario #}
+10+
+10E+10E
+100.00,00
+
+100.00E+10
+100.00E+10E
+4.8, 3.10E+10
+end_prog
+;
+<-
+*
+/
+
+_id
+"oi"
+HELLO
+while
+#kjsjkds
+10005 50.8
+,
+'teste'
+( 
+)*-+;
+$ga

@@ -35,15 +35,15 @@ public class Syntactic {
         System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.printf("%5s %15s %20s %60s", "#", "POS(x,y)", "LEXEMA", "TOKEN");
         System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
-		token.printToken(id);
+		//token.printToken(id);
 		// CASO O 1 TOKEN GERADO PELO LEXICO NAO SEJA O FIM DO ARQUIVO O ANALISADOR SINTATICO 
 		// FICA PEDINDO TOKENS PARA O LEXICO ATE QUE CHEGUE UM TOKEN QUE SEJA O FIM DO ARQUIVO
 		while (token.getType() != TokenType.EOF) {
+			// PRINTA O TOKEN GERADO
+			token.printToken(id);
 			id++;
 			// SOLICITA O PROXIMO TOKEN PARA O ANALISADOR LEXICO
 			token = lexicon.nextToken();
-			// PRINTA O TOKEN GERADO
-			token.printToken(id);
 		}
 		
 		processDerivas();
@@ -358,7 +358,7 @@ public class Syntactic {
 		if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-			derivaFExpNum();
+			derivaExpNum();
 		} else if (token == null) {
 			lexicon.storeToken(token);
 			token = lexicon.nextToken();

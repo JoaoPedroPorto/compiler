@@ -36,6 +36,13 @@ public class Lexicon {
 	}
 
 	public Token nextToken() throws IOException {
+		
+		if (buffer != null) {
+			Token t = buffer;
+			buffer = null;
+			return t;
+		}
+		
 		lexeme = new StringBuilder();
 		line = fLoader.getLine();
 		column = fLoader.getColumn();
@@ -149,52 +156,20 @@ public class Lexicon {
 	
 	private Token processId() throws IOException {
 		try {
-			lexeme.append(character);
-			boolean hasId = true;
+			
+			
 			do {
-				character = fLoader.getNextChar();
-				if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
-					hasId = false;
-					break;
-				}
-				if (character == '_' && 
-						(Character.isLetter(lexeme.charAt(lexeme.length() - 1)) || Character.isDigit(lexeme.charAt(lexeme.length() - 1)))) {
-					lexeme.append(character);
-					errors.addErro("Erro ID: Encontrado letra antes de '_'.", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
 				lexeme.append(character);
+				//boolean hasId = true;
+				character = fLoader.getNextChar();
 			} while(Character.isLetter(character) || Character.isDigit(character) || character == '_');
 			fLoader.resetLastChar();
-			if (hasId) {
-				return tabSymbols.addID(lexeme.toString(), line, column);
-			}
-			lexeme.append(character);
-			errors.addErro("Caracter invalido para id.", lexeme.toString(), line, column);
-			return this.nextToken();
 		} catch (EOFException e) {
-			lexeme.append(character);
-			errors.addErro("Finalizado durante validacao de Id. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-			return token_EOF();
 		}
+		
+		return tabSymbols.addID(lexeme.toString(), line, column);
 	}
 
-	/*private Token process_ID() throws IOException {
-		lexeme.append(character);
-		try {
-			while (true) {
-				character = fLoader.getNextChar();
-				if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
-					fLoader.resetLastChar();
-					return tabSymbols.addID(lexeme.toString(), line, column);
-				}
-				lexeme.append(character);
-			}
-		} catch (EOFException e) {
-			return tabSymbols.addID(lexeme.toString(), line, column);
-		}
-	}*/
-	
 	private Token processNumInt() throws IOException {
 		try {
 			lexeme.append(character);
@@ -226,12 +201,12 @@ public class Lexicon {
 					countPlus ++;
 				lexeme.append(character);
 			} while(character == '.' || Character.isDigit(character) || character == 'E' || character == '+' || character == ',');
-			lexeme.append(character);
-			return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);	
 		} catch (EOFException e) {
-			errors.addErro("Finalizado durante validacao de literal numerico inteiro. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-			return token_EOF();
+	//		errors.addErro("Finalizado durante validacao de literal numerico inteiro. Problema: " + e.getMessage(), lexeme.toString(), line, column);
+	//		return token_EOF();
 		}
+		//lexeme.append(character);
+		return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);	
 	}
 	
 	private Token processNumFloat() throws IOException {
@@ -376,7 +351,7 @@ public class Lexicon {
 
 	// RETORNA UM TOKEN DE FIM DE ARQUIVO
 	private Token token_EOF(){
-		return tabSymbols.addID("EOF", line, column);
+		return new Token(TokenType.EOF, "");
 	}
 
 }

@@ -24,6 +24,7 @@ public class TabSymbols {
 	private TabSymbols() {
 		table = new HashMap<String, Token>();
 		// PRE-CARREGA PALAVRAS RESERVADAS
+		/*
 		table.put("+", new Token(TokenType.ARIT_AS, "+"));
 		table.put("-", new Token(TokenType.ARIT_AS, "-"));
 		table.put("*", new Token(TokenType.ARIT_MD, "*"));
@@ -31,6 +32,7 @@ public class TabSymbols {
 		table.put(";", new Token(TokenType.TERM, ";"));
 		table.put("(", new Token(TokenType.L_PAR, "("));
 		table.put(")", new Token(TokenType.R_PAR, ")"));
+		*/
 		table.put("true", new Token(TokenType.LOGIC_VAL, "true"));
 		table.put("false", new Token(TokenType.LOGIC_VAL, "false"));
 		table.put("and", new Token(TokenType.LOGIC_OP, "and"));
@@ -52,8 +54,10 @@ public class TabSymbols {
 		table.put("while", new Token(TokenType.WHILE, "while"));
 		table.put("declare", new Token(TokenType.DECLARE, "declare"));
 		table.put("to", new Token(TokenType.TO, "to"));
+		/*
 		table.put("<-", new Token(TokenType.ASSIGN, "<-"));
 		table.put("EOF", new Token(TokenType.EOF, "EOF"));
+		*/
 	}
 	
 	public static TabSymbols getInstance() {
