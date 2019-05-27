@@ -51,7 +51,7 @@ public class Lexicon {
 		try {
 			character = fLoader.getNextChar();
 		} catch (Exception ex) {
-			return  token_EOF();
+			return  tokenEOF();
 		}
 
 		// VERIFICA SE O CARACTER GERADO CONTER ESPACO
@@ -61,7 +61,7 @@ public class Lexicon {
 			try {
 				character = fLoader.getNextChar();
 			} catch (Exception e) {
-				return  token_EOF();
+				return  tokenEOF();
 			}
 		}
 
@@ -69,34 +69,34 @@ public class Lexicon {
 		switch (character) {
 			case '+':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.ARIT_AS, lexeme.toString(), line, column);
 				break;
 			case '-':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.ARIT_AS, lexeme.toString(), line, column);
 				break;
 			case '*':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.ARIT_MD, lexeme.toString(), line, column);
 				break;
 			case '/':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.ARIT_MD, lexeme.toString(), line, column);
 				break;
 			case '<':
 				token = processAssign();
 				break;
 			case ';':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.TERM, lexeme.toString(), line, column);
 				break;
 			case '(':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.L_PAR, lexeme.toString(), line, column);
 				break;
 			case ')':
 				lexeme.append(character);
-				token = tabSymbols.addID(lexeme.toString(), line, column);
+				token = new Token(TokenType.R_PAR, lexeme.toString(), line, column);
 				break;
 			case '$':
 				token = processRelop();
@@ -121,37 +121,34 @@ public class Lexicon {
 					break;
 				}
 				lexeme.append(character);
-				errors.addErro("Caracter inválido: ", lexeme.toString(), line, column);
+				errors.addErro("Caracter invalido: ", lexeme.toString(), line, column);
 				this.nextToken();
 		}
 		return token;
 	}
+	
 	private Token processLiteral() throws IOException {
 		try {
-			lexeme.append(character);
-			boolean hasLiteral = false;
-			if (lexeme.charAt(lexeme.length() - 1) == '\'') {
-				lexeme.append(character);
-				errors.addErro("Erro Literal: Caractere' \' ' nao e aceito para literal.", lexeme.toString(), line, column);
+			if (character == '\'') {
+				errors.addErro("Erro Literal: Caractere ' \' ' nao e aceito para literal.", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
 			do {
-				character = fLoader.getNextChar();
-				if (character == '\"')
-					hasLiteral = true;
-			} while(character != '\"');
-			if (hasLiteral) {
 				lexeme.append(character);
-				return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
+				character = fLoader.getNextChar();
+			} while(character != '\"');
+			lexeme.append(character);
+			if (character != '\"') {
+				errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
+				return this.nextToken();
 			}
-			lexeme.append(character);
-			errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
-			return this.nextToken();
 		} catch (EOFException e) {
-			lexeme.append(character);
-			errors.addErro("Finalizado durante validacao de literal. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-			return token_EOF();
+			if (character != '\"' || lexeme.toString().length() == 1) {
+				errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
 		}
+		return new Token(TokenType.LITERAL, lexeme.toString(), line, column);
 	}
 	
 	private Token processId() throws IOException {
@@ -160,8 +157,18 @@ public class Lexicon {
 				lexeme.append(character);
 				character = fLoader.getNextChar();
 			} while(Character.isLetter(character) || Character.isDigit(character) || character == '_');
+			if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
+				lexeme.append(character);
+				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
 			fLoader.resetLastChar();
 		} catch (EOFException e) {
+			if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
+				lexeme.append(character);
+				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
 		}
 		return tabSymbols.addID(lexeme.toString(), line, column);
 	}
@@ -229,57 +236,59 @@ public class Lexicon {
 			character = fLoader.getNextChar();
 			if (character != '-') {
 				lexeme.append(character);
-				errors.addErro("Erro Atribuicao: Espera '-'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Atribuicao: Espera '-' no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
-			lexeme.append(character);
-			return  new Token(TokenType.ASSIGN, lexeme.toString(), line, column);
 		} catch (Exception e) {
-			errors.addErro("Finalizado durante atribuicao. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-			return token_EOF();
+			if (lexeme.toString().length() != 2) {
+				errors.addErro("Erro Atribuicao: Sequencia de caracteres nao formam uma atribuicao.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
 		}
+		lexeme.append(character);
+		return  new Token(TokenType.ASSIGN, lexeme.toString(), line, column);
 	}
-
+	
 	private Token processRelop() throws IOException {
 		try {
 			lexeme.append(character);
 			character = fLoader.getNextChar();
-			if ((character == 'l' || character == 'g' || character == 'e' || character == 'd')) {
+			if (character != 'l' && character != 'g' && character != 'e' && character != 'd') {
 				lexeme.append(character);
-				character = fLoader.getNextChar();
-				if (character == 't' || character == 'e' || character == 'q' || character == 'f') {
-					if ((character == 't' || character == 'e')
-							&& (lexeme.charAt(lexeme.length() - 1) != 'l' && lexeme.charAt(lexeme.length() - 1) != 'g')) {
-						lexeme.append(character);
-						errors.addErro("Erro Operador Logico: Espera [ 'l', 'g' ].", lexeme.toString(), line, column);
-						return this.nextToken();
-					} else if (character == 'q' && lexeme.charAt(lexeme.length() - 1) != 'e') {
-						lexeme.append(character);
-						errors.addErro("Erro Operador Logico: Espera [ 'e' ].", lexeme.toString(), line, column);
-						return this.nextToken();
-					} else if (character == 'f' && lexeme.charAt(lexeme.length() - 1) != 'd') {
-						lexeme.append(character);
-						errors.addErro("Erro Operador Logico: Espera [ 'd' ].", lexeme.toString(), line, column);
-						return this.nextToken();
-					}
-					lexeme.append(character);
-					return new Token(TokenType.RELOP, lexeme.toString(), line, column);
-				} else {
-					lexeme.append(character);
-					errors.addErro("Erro Operador Logico: Espera [ 't', 'e', 'q', 'f' ]", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-			} else {
+				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g', 'e', 'd' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
+			lexeme.append(character);
+			character = fLoader.getNextChar();
+			if (character != 't' && character != 'e' && character != 'q' && character != 'f') {
 				lexeme.append(character);
-				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g', 'e', 'd' ].", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 't', 'e', 'q', 'f' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
+			if ((character == 't' || character == 'e')
+					&& (lexeme.charAt(lexeme.length() - 1) != 'l' && lexeme.charAt(lexeme.length() - 1) != 'g')) {
+				lexeme.append(character);
+				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				return this.nextToken();
+			} else if (character == 'q' && lexeme.charAt(lexeme.length() - 1) != 'e') {
+				lexeme.append(character);
+				errors.addErro("Erro Operador Logico: Espera [ 'e' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				return this.nextToken();
+			} else if (character == 'f' && lexeme.charAt(lexeme.length() - 1) != 'd') {
+				lexeme.append(character);
+				errors.addErro("Erro Operador Logico: Espera [ 'd' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
 		} catch (EOFException e) {
-			errors.addErro("Finalizado durante validacao de operação logica. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-			return token_EOF();
+			if (lexeme.toString().length() != 3) {
+				errors.addErro("Erro Operador Logico: Caracteres informados nao forma um operador valido.", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
 		}
+		lexeme.append(character);
+		return new Token(TokenType.RELOP, lexeme.toString(), line, column);
 	}
-	
+
 	public void storeToken(Token token) {
 		this.buffer = token; 
 	}
@@ -287,35 +296,30 @@ public class Lexicon {
 
 	private void ignoreComments() throws IOException {
 		try {
+			lexeme.append(character);
 			character = fLoader.getNextChar();
-			boolean hasFence = false;
 			if (character != '#') {
-				errors.addErro("Erro Comentario: Espera {# #}.", "comentarios", line, column);
+				lexeme.append(character);
+				errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column);
 				return;
 			}
 			do {
-				character = fLoader.getNextChar();
-				if (character == '#')
-					hasFence = true;
 				lexeme.append(character);
-			} while(character != '#');
-			if (hasFence) {
 				character = fLoader.getNextChar();
-				if (character == '}') {
-					return;
-				}
-				fLoader.resetLastChar();
-				errors.addErro("Erro Comentario: Espera {# #}.", "comentarios", line, column);
+			} while(character != '#');
+			lexeme.append(character);
+			character = fLoader.getNextChar();
+			if (character != '}') {
+				errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column);
+				return;
 			}
-			fLoader.resetLastChar();
-			errors.addErro("Erro Comentario: Espera {# #}.", "comentarios", line, column);
 		} catch (EOFException e) {
-			errors.addErro("Finalizado durante validacao de comentario", "comentarios", line, column);
+			errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column);
 		}
 	}
 
 	// RETORNA UM TOKEN DE FIM DE ARQUIVO
-	private Token token_EOF(){
+	private Token tokenEOF(){
 		return new Token(TokenType.EOF, "");
 	}
 
