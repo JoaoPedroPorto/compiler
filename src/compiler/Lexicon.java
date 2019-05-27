@@ -38,9 +38,9 @@ public class Lexicon {
 	public Token nextToken() throws IOException {
 		
 		if (buffer != null) {
-			Token t = buffer;
+			Token token = buffer;
 			buffer = null;
-			return t;
+			return token;
 		}
 		
 		lexeme = new StringBuilder();
@@ -113,7 +113,7 @@ public class Lexicon {
 				break;
 			default:
 				if (Character.isDigit(character)) {
-					token = processNumInt();
+					token = processNumIntAndNumFloat();
 					break;
 				}
 				if (Character.isLetter(character) || character == '_') {
@@ -156,108 +156,73 @@ public class Lexicon {
 	
 	private Token processId() throws IOException {
 		try {
-			
-			
 			do {
 				lexeme.append(character);
-				//boolean hasId = true;
 				character = fLoader.getNextChar();
 			} while(Character.isLetter(character) || Character.isDigit(character) || character == '_');
 			fLoader.resetLastChar();
 		} catch (EOFException e) {
 		}
-		
 		return tabSymbols.addID(lexeme.toString(), line, column);
 	}
-
-	private Token processNumInt() throws IOException {
-		try {
-			lexeme.append(character);
-			int countE = 0;
-			int countPlus = 0;
-			do {
-				character = fLoader.getNextChar();
-				if (!Character.isDigit(character) && character != 'E' && character != '+') {
-					if (character == '.' || character == ',')
-						return processNumFloat();
-					fLoader.resetLastChar();
-					lexeme.append(character);
-					errors.addErro("Caracter invalido para literal numerico inteiro.", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == 'E' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countE != 0)) {
-					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Inteiro: Espera 'digito' antes do 'E' ou possue mais de um 'E'.", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == '+' && (lexeme.charAt(lexeme.length() - 1) != 'E' || countPlus != 0)) {
-					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Inteiro: Espera 'E' antes do '+' ou possue mais de um '+'", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == 'E')
-					countE ++;
-				else if (character == '+')
-					countPlus ++;
-				lexeme.append(character);
-			} while(character == '.' || Character.isDigit(character) || character == 'E' || character == '+' || character == ',');
-		} catch (EOFException e) {
-	//		errors.addErro("Finalizado durante validacao de literal numerico inteiro. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-	//		return token_EOF();
-		}
-		//lexeme.append(character);
-		return new Token(TokenType.NUM_INT, lexeme.toString(), line, column);	
-	}
 	
-	private Token processNumFloat() throws IOException {
+	private Token processNumIntAndNumFloat() throws IOException {
+		TokenType tokenType = TokenType.NUM_INT;
 		try {
-			if (lexeme.charAt(lexeme.length() - 1) == ',') {
+			while (Character.isDigit(character)) {
 				lexeme.append(character);
-				errors.addErro("Erro Literal Numerico Decimal: Espera '.', mas contem ','.", lexeme.toString(), line, column);
+				character = fLoader.getNextChar();
+			}
+			if (character == '.') {
+				tokenType = TokenType.NUM_FLOAT;
+				lexeme.append(character);
+				character = fLoader.getNextChar();
+				if (!Character.isDigit(character)) {
+					lexeme.append(character);
+					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' depois do '.'", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				while (Character.isDigit(character)) {
+					lexeme.append(character);
+					character = fLoader.getNextChar();
+				}
+			}
+			if (character == 'E' || character == 'e') {
+				lexeme.append(character);
+				character = fLoader.getNextChar();
+				if (character != '-' && character != '+') {
+					lexeme.append(character);
+					errors.addErro("Erro Literal Numerico: Espera ['-', '+'] depois do ['E', 'e']", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				lexeme.append(character);
+				character = fLoader.getNextChar();
+				if (!Character.isDigit(character)) {
+					lexeme.append(character);
+					errors.addErro("Erro Literal Numerico: Espera 'digito' depois do ['-', '+']", lexeme.toString(), line, column);
+					return this.nextToken();
+				}
+				while (Character.isDigit(character)) {
+					lexeme.append(character);
+					character = fLoader.getNextChar();
+				}
+			}
+			if (Character.isLetter(character)) {
+				lexeme.append(character);
+				errors.addErro("Erro Literal Numerico: Caractere '" + character + "' nao e valido", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
-			lexeme.append(character);
-			int countE = 0;
-			int countPlus = 0;
-			int countPoint = 1;
-			do {
-				character = fLoader.getNextChar();
-				if (character == ',') {
-					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Decimal: Espera '.', mas contem ','.", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == 'E' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countE != 0)) {
-					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' antes do 'E' ou possue mais de um 'E'.", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == '+' && (lexeme.charAt(lexeme.length() - 1) != 'E' || countPlus != 0)) {
-					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Decimal: Espera 'E' antes do '+' ou possue mais de um '+'", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == '.' && (!Character.isDigit(lexeme.charAt(lexeme.length() - 1)) || countPoint > 1)) {
-					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' antes do '.' ou ja possui '.'", lexeme.toString(), line, column);
-					return this.nextToken();
-				}
-				if (character == 'E')
-					countE ++;
-				else if (character == '+')
-					countPlus ++;
-				else if (character == '.')
-					countPoint ++;
-				lexeme.append(character);
-			} while(character == '.' || Character.isDigit(character) || character == 'E' || character == '+' || character == ',');
-			lexeme.append(character);
-			return new Token(TokenType.NUM_FLOAT, lexeme.toString(), line, column);
 		} catch (EOFException e) {
-			errors.addErro("Finalizado durante validacao de literal numerico decimal. Problema: " + e.getMessage(), lexeme.toString(), line, column);
-			return token_EOF();
+			try {
+				Double.parseDouble(lexeme.toString());
+			} catch (Exception e1) {
+				errors.addErro("Erro Literal Numerico: Nao e possivel gerar um numero com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
+				return this.nextToken();
+			}
 		}
+		return new Token(tokenType, lexeme.toString(), line, column);
 	}
-	
+
 	private Token processAssign() throws IOException {
 		try {
 			lexeme.append(character);
