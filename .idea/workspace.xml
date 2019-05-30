@@ -2,8 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa2cffb5-620e-47d7-a6ea-429c3839b3b2" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Application.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/compiler/Compiler.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Compiler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/Compiler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/Compiler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/ErrorHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/ErrorHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/ErrorReport.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/ErrorReport.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/FileLoader.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/FileLoader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/Lexicon.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Lexicon.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/PlatformEnum.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/PlatformEnum.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/Syntactic.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Syntactic.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/TabSymbols.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/TabSymbols.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/Token.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/Token.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/compiler/TokenType.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/compiler/TokenType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/Syntactic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/Syntactic.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,11 +26,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/Compiler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="21" column="4" lean-forward="true" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
+            <state relative-caret-position="306">
+              <caret line="21" selection-start-line="21" selection-end-line="21" />
             </state>
           </provider>
         </entry>
@@ -26,7 +38,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/ErrorHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
+            <state relative-caret-position="442">
               <caret line="29" column="74" selection-start-line="29" selection-start-column="74" selection-end-line="29" selection-end-column="74" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -47,22 +59,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/Lexicon.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="387">
-              <caret line="318" column="13" lean-forward="true" selection-start-line="318" selection-start-column="13" selection-end-line="318" selection-end-column="13" />
+            <state relative-caret-position="-127">
+              <caret line="71" column="51" selection-start-line="71" selection-start-column="44" selection-end-line="71" selection-end-column="51" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#10118#10119#0" expanded="true" />
-                <element signature="e#10169#10170#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/compiler/Syntactic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="272">
+              <caret line="48" column="64" selection-start-line="48" selection-start-column="64" selection-end-line="48" selection-end-column="64" />
             </state>
           </provider>
         </entry>
@@ -79,8 +89,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/TokenType.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="24" column="10" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
+            <state relative-caret-position="357">
+              <caret line="21" column="11" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -97,7 +107,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/ErrorReport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="799">
+            <state relative-caret-position="663">
               <caret line="47" selection-start-line="47" selection-end-line="47" />
             </state>
           </provider>
@@ -106,7 +116,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/compiler/FileLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
+            <state relative-caret-position="1598">
               <caret line="99" selection-start-line="99" selection-end-line="99" />
             </state>
           </provider>
@@ -125,6 +135,23 @@
     <findStrings>
       <find>token_eof</find>
       <find>#</find>
+      <find>NULL</find>
+      <find>cmd</find>
+      <find>cmds</find>
+      <find>bloco</find>
+      <find>decl</find>
+      <find>derivacmds</find>
+      <find>cond</find>
+      <find>derivaFValLog</find>
+      <find>derivaexplo</find>
+      <find>ARIT_AS</find>
+      <find>EXPLO</find>
+      <find>fva</find>
+      <find>FID</find>
+      <find>fvallog</find>
+      <find>follow</find>
+      <find>fid1</find>
+      <find>explo</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -133,7 +160,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/compiler/Syntactic.java" />
         <option value="$PROJECT_DIR$/src/compiler/ErrorHandler.java" />
         <option value="$PROJECT_DIR$/src/compiler/ErrorReport.java" />
         <option value="$PROJECT_DIR$/src/compiler/Token.java" />
@@ -141,6 +167,7 @@
         <option value="$PROJECT_DIR$/src/compiler/TabSymbols.java" />
         <option value="$PROJECT_DIR$/src/compiler/Lexicon.java" />
         <option value="$PROJECT_DIR$/src/compiler/Compiler.java" />
+        <option value="$PROJECT_DIR$/src/compiler/Syntactic.java" />
       </list>
     </option>
   </component>
@@ -233,25 +260,26 @@
       <workItem from="1554571012975" duration="6480000" />
       <workItem from="1554674883258" duration="10105000" />
       <workItem from="1556492385519" duration="6795000" />
+      <workItem from="1559173485090" duration="8721000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23380000" />
+    <option name="totallyTimeSpent" value="32101000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.52398723" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13646056" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
       <window_info id="Favorites" order="4" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32936078" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39869988" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32936078" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39869988" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -281,6 +309,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/compiler/Compiler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/compiler/ErrorHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="29" column="74" selection-start-line="29" selection-start-column="74" selection-end-line="29" selection-end-column="74" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/compiler/Token.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
@@ -290,25 +335,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/compiler/ErrorReport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="799">
+        <state relative-caret-position="663">
           <caret line="47" selection-start-line="47" selection-end-line="47" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/compiler/TokenType.java">
+    <entry file="file://$PROJECT_DIR$/src/compiler/FileLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="24" column="10" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/compiler/ErrorHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="29" column="74" selection-start-line="29" selection-start-column="74" selection-end-line="29" selection-end-column="74" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="1598">
+          <caret line="99" selection-start-line="99" selection-end-line="99" />
         </state>
       </provider>
     </entry>
@@ -319,20 +354,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/compiler/Syntactic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/compiler/FileLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="99" selection-start-line="99" selection-end-line="99" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/compiler/TabSymbols.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -340,22 +361,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/compiler/TokenType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="21" column="11" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/compiler/Lexicon.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="318" column="13" lean-forward="true" selection-start-line="318" selection-start-column="13" selection-end-line="318" selection-end-column="13" />
+        <state relative-caret-position="-127">
+          <caret line="71" column="51" selection-start-line="71" selection-start-column="44" selection-end-line="71" selection-end-column="51" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#10118#10119#0" expanded="true" />
-            <element signature="e#10169#10170#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/compiler/Compiler.java">
+    <entry file="file://$PROJECT_DIR$/src/compiler/Syntactic.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="21" column="4" lean-forward="true" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
+        <state relative-caret-position="272">
+          <caret line="48" column="64" selection-start-line="48" selection-start-column="64" selection-end-line="48" selection-end-column="64" />
         </state>
       </provider>
     </entry>
