@@ -19,6 +19,7 @@ public class Syntactic {
 	
 	private Lexicon lexicon;
 	private ErrorHandler errors = ErrorHandler.getInstance();
+	private First _first = First.getInstance();
 	
 	// INTANCIA O ANALISADOR LEXICO E PASSA NO CONSTRUTOR O ARQUIVO A SER VERIFICADO
 	public Syntactic(String fileName) throws IOException {
