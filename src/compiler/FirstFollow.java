@@ -1,10 +1,330 @@
 package compiler;
 
-public  class First {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    private First(){}
+public  class FirstFollow {
+	
+	private static FirstFollow instance = new FirstFollow();
+	
+	private Map<NonTerm, List<TokenType>> first = new HashMap<>();
+	private Map<NonTerm, List<TokenType>> follow = new HashMap<>();
+	
+	public static FirstFollow getInstance() {
+        return instance;
+    }
+	
+	private FirstFollow() {
+		 List<TokenType> list;
+		 
+		 // FIRST S
+		 list = new ArrayList<>();
+		 list.add(TokenType.PROGRAM);
+		 first.put(NonTerm.S, list);
+		 
+		 // FIRST CMDS
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 list.add(TokenType.ID);
+		 first.put(NonTerm.CMDS, list);
+		 // FOLLOW CMDS
+		 list = new ArrayList<>();
+		 list.add(TokenType.END);
+		 follow.put(NonTerm.CMDS, list);
+		 
+		 // FIRST CMD
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 first.put(NonTerm.CMD, list);
+		// FOLLOW CMD
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.END);
+		 list.add(TokenType.END_PROG);
+		 list.add(TokenType.ELSE);
+		 follow.put(NonTerm.CMD, list);
+		 
+		 // FIRST DECL
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 first.put(NonTerm.DECL, list);
+		 // FIRST DECL
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.END);
+		 list.add(TokenType.END_PROG);
+		 list.add(TokenType.ELSE);
+		 follow.put(NonTerm.DECL, list);
+		 
+		 // FIRST COND
+		 list = new ArrayList<>();
+		 list.add(TokenType.IF);
+		 first.put(NonTerm.COND, list);
+		 // FOLLOW COND
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.END);
+		 list.add(TokenType.END_PROG);
+		 list.add(TokenType.ELSE);
+		 follow.put(NonTerm.COND, list);
+		 
+		 // FIRST CNDB
+		 list = new ArrayList<>();
+		 list.add(TokenType.ELSE);
+		 first.put(NonTerm.CNDB, list);
+		// FOLLOW CNDB
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.END);
+		 list.add(TokenType.END_PROG);
+		 list.add(TokenType.ELSE);
+		 follow.put(NonTerm.CNDB, list);
+		 
+		 // FIRST ATRIB
+ 		 list = new ArrayList<>();
+		 list.add(TokenType.ID);
+		 first.put(NonTerm.ATRIB, list);
+		 // FOLLOW ATRIB
+		 list = new ArrayList<>();
+		 list.add(TokenType.DECLARE);
+		 list.add(TokenType.IF);
+		 list.add(TokenType.FOR);
+		 list.add(TokenType.WHILE);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.END);
+		 list.add(TokenType.END_PROG);
+		 list.add(TokenType.ELSE);
+		 follow.put(NonTerm.ATRIB, list);
+		 
+		 // FIRST EXP
+		 list = new ArrayList<>();
+		 list.add(TokenType.LOGIC_VAL);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.NUM_INT);
+		 list.add(TokenType.NUM_FLOAT);
+		 list.add(TokenType.L_PAR);
+		 list.add(TokenType.LITERAL);
+		 first.put(NonTerm.EXP, list);
+		 // FOLLOW EXP
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.EXP, list);
+		 
+		 // FIRST FID
+		 list = new ArrayList<>();
+		 list.add(TokenType.LOGIC_OP);
+		 list.add(TokenType.ARIT_AS);
+		 list.add(TokenType.ARIT_MD);
+		 first.put(NonTerm.FID, list);
+		 // FOLLOW FID
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FID, list);
+		 
+		 // FIRST FOPNUM
+		 list = new ArrayList<>();
+		 list.add(TokenType.L_PAR);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.NUM_INT);
+		 list.add(TokenType.NUM_FLOAT);
+		 first.put(NonTerm.FOPNUM, list);
+		 // FOLLOW FOPNUM
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FOPNUM, list);
+		 
+		 // FIRST FEXPNUM1
+		 list = new ArrayList<>();
+		 list.add(TokenType.RELOP);
+		 first.put(NonTerm.FEXPNUM1, list);
+		 // FOLLOW FEXPNUM1
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FEXPNUM1, list);
+		 
+		 // FIRST FNUMINT
+		 list = new ArrayList<>();
+		 list.add(TokenType.ARIT_AS);
+		 list.add(TokenType.ARIT_MD);
+		 first.put(NonTerm.FNUMINT, list);
+		 // FOLLOW FNUMINT
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FNUMINT, list);
+		 
+		 // FIRST FOPNUM1
+		 list = new ArrayList<>();
+		 list.add(TokenType.L_PAR);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.NUM_INT);
+		 list.add(TokenType.NUM_FLOAT);
+		 first.put(NonTerm.FOPNUM1, list);
+		 // FOLLOW FOPNUM1
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FOPNUM1, list);
+		 
+		 // FIRST FEXPNUM2
+		 list = new ArrayList<>();
+		 list.add(TokenType.RELOP);
+		 first.put(NonTerm.FEXPNUM2, list);
+		 // FOLLOW FEXPNUM2
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FEXPNUM2, list);
+		 
+		 // FIRST FNUMFLOAT
+		 list = new ArrayList<>();
+		 list.add(TokenType.ARIT_AS);
+		 list.add(TokenType.ARIT_MD);
+		 first.put(NonTerm.FNUMFLOAT, list);
+		 // FOLLOW FNUMFLOAT
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FNUMFLOAT, list);
+		 
+		 // FIRST FOPNUM2
+		 list = new ArrayList<>();
+		 list.add(TokenType.L_PAR);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.NUM_INT);
+		 list.add(TokenType.NUM_FLOAT);
+		 first.put(NonTerm.FOPNUM2, list);
+		 // FOLLOW FOPNUM2
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FOPNUM2, list);
+		 
+		 // FIRST FEXPNUM3
+		 list = new ArrayList<>();
+		 list.add(TokenType.RELOP);
+		 first.put(NonTerm.FEXPNUM3, list);
+		 // FOLLOW FEXPNUM3
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FEXPNUM3, list);
+		 
+		 // FIRST FLPAR
+		 list = new ArrayList<>();
+		 list.add(TokenType.L_PAR);
+		 list.add(TokenType.ID);
+		 list.add(TokenType.NUM_INT);
+		 list.add(TokenType.NUM_FLOAT);
+		 first.put(NonTerm.FLPAR, list);
+		 // FOLLOW FLPAR
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FLPAR, list);
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+	}
+	
+	public Map<NonTerm, List<TokenType>> getFirst() {
+		return first;
+	}
+	public Map<NonTerm, List<TokenType>> getFollow() {
+		return follow;
+	}
+	
+	
+	public boolean isInFirst(NonTerm nonTerm, Token tk) {
+        if (first.get(nonTerm).contains(tk.getType()))
+            return true;
+        return false;
+    }
 
-    private static First instance = new First();
+    public boolean isInFollow(NonTerm nonTerm, Token tk) {
+        if (follow.get(nonTerm).contains(tk.getType()))
+            return true;
+        return false;
+    }
+	
+	
+	
+	
+	
+/*
+    private FirstFollow(){}
+
 
     public static First getInstance() {
         return instance;
@@ -276,5 +596,5 @@ public  class First {
             return true;
 
         return false;
-    }
+    }*/
 }

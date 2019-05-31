@@ -19,7 +19,7 @@ public class Syntactic {
 	
 	private Lexicon lexicon;
 	private ErrorHandler errors = ErrorHandler.getInstance();
-	private First _first = First.getInstance();
+	// private First _first = First.getInstance();
 	
 	// INTANCIA O ANALISADOR LEXICO E PASSA NO CONSTRUTOR O ARQUIVO A SER VERIFICADO
 	public Syntactic(String fileName) throws IOException {
@@ -27,27 +27,27 @@ public class Syntactic {
 	}
 	
 	public void process() throws IOException {
-		int id = 1;
+		// int id = 1;
 		// SOLICITA O PROXIMO TOKEN PARA O ANALISADOR LEXICO
-		Token token = lexicon.nextToken();
+		// Token token = lexicon.nextToken();
 		// PRINTA OS TOKENS GERADOS
-		System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------");
+		/*System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println("                                                                   TOKENS GERADOS                                                                   ");
         System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.printf("%5s %15s %20s %60s", "#", "POS(x,y)", "LEXEMA", "TOKEN");
-        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
+        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");*/
 		//token.printToken(id);
 		// CASO O 1 TOKEN GERADO PELO LEXICO NAO SEJA O FIM DO ARQUIVO O ANALISADOR SINTATICO 
 		// FICA PEDINDO TOKENS PARA O LEXICO ATE QUE CHEGUE UM TOKEN QUE SEJA O FIM DO ARQUIVO
-		while (token.getType() != TokenType.EOF) {
+		/*while (token.getType() != TokenType.EOF) {
 			// PRINTA O TOKEN GERADO
 			token.printToken(id);
 			id++;
 			// SOLICITA O PROXIMO TOKEN PARA O ANALISADOR LEXICO
 			token = lexicon.nextToken();
-		}
+		}*/
 		
-		//processDerivas();  INICIA PROCESSO DE DERIVAÇÃO!!!!!!!
+		derivaS();
 		
 		// PRINTA A TABELA DE SIMBOLOS
 		TabSymbols.getInstance().printTabSymbols();
@@ -55,16 +55,36 @@ public class Syntactic {
 		ErrorHandler.getInstance().errorReport();
 	}
 	
-	public void processDerivas() throws IOException {
-		derivaS();
+	private void reSyncFollow(NonTerm nt) {
+		try {
+			Token token = null;
+			do {
+				token = lexicon.nextToken();
+			} while (!FirstFollow.getInstance().isInFollow(nt, token));
+			lexicon.storeToken(token);
+		} catch (IOException e) {
+		}
+	}
+	
+	private void reSyncFirst(NonTerm nt) {
+		try {
+			Token token = null;
+			do {
+				token = lexicon.nextToken();
+			} while (!FirstFollow.getInstance().isInFirst(nt, token));
+			lexicon.storeToken(token);
+		} catch (IOException e) {
+		}
 	}
 
 	public void derivaS() throws IOException {
 		Token token = lexicon.nextToken();
-		if (token.getType() == TokenType.PROGRAM)
-			token = lexicon.nextToken();
-		else 
+		if (token.getType() != TokenType.PROGRAM) {
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			reSyncFollow(NonTerm.S);
+		}
+		token = lexicon.nextToken();
+		
 		if (token.getType() == TokenType.ID)
 			token = lexicon.nextToken();
 		else 

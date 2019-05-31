@@ -1,0 +1,36 @@
+package compiler;
+
+public enum NonTerm {
+    S,
+    BLOCO,
+    CMDS,
+    CMD,
+    DECL,
+    COND,
+    CNDB,
+    ATRIB,
+    EXP,
+    FID,
+    FOPNUM,
+    FEXPNUM1,
+    FNUMINT,
+    FOPNUM1,
+    FEXPNUM2,
+    FNUMFLOAT,
+    FOPNUM2,
+    FEXPNUM3,
+    FLPAR,
+    FEXPNUM,
+    FRPAR,
+    EXPLO,
+    FID1,
+    FVALLOG,
+    EXPNUM,
+    XEXPNUM,
+    OPNUM,
+    VAL,
+    REP,
+    REPF,
+    REPW
+
+}
