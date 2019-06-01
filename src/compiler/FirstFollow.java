@@ -241,9 +241,23 @@ public  class FirstFollow {
 		 list.add(TokenType.TERM);
 		 follow.put(NonTerm.FLPAR, list);
 		 
+		 // FIRST FEXPNUM
+		 list = new ArrayList<>();
+		 list.add(TokenType.R_PAR);
+		 first.put(NonTerm.FEXPNUM, list);
+		 // FOLLOW FEXPNUM
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FEXPNUM, list);
 		 
-		 
-		 
+		 // FIRST FRPAR
+		 list = new ArrayList<>();
+		 list.add(TokenType.RELOP);
+		 first.put(NonTerm.FRPAR, list);
+		 // FOLLOW FRPAR
+		 list = new ArrayList<>();
+		 list.add(TokenType.TERM);
+		 follow.put(NonTerm.FRPAR, list);
 		 
 		 
 		 

@@ -79,6 +79,18 @@ public class Syntactic {
 
 	public void derivaS() throws IOException {
 		Token token = lexicon.nextToken();
+		if (FirstFollow.getInstance().isInFirst(NonTerm.S, token)) {
+			token = lexicon.nextToken();
+			if (token.getType() == TokenType.ID)
+				token = lexicon.nextToken();
+			
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.S, token)) {
+			
+		}
+		
+		
+		
+		
 		if (token.getType() != TokenType.PROGRAM) {
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			reSyncFollow(NonTerm.S);
