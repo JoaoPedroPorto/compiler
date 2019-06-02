@@ -1,1 +1,8 @@
-{# comentario #}
+program TESTE_01;
+    begin
+        declare var_1 int;
+                
+        var_1 <- 10;
+        		
+     end
+end_prog;

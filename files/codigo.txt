@@ -7,7 +7,7 @@ programa TESTE_01;
         declare var_5 logico;
         declare var_6 num;
                 
-        var_1 << 10;
+        var_1 <, 10;
         var_2 << var_1 + 100;
         var_4 << 'Variavel 2 eh do tipo texto';
         var_5 << falso;

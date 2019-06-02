@@ -156,13 +156,18 @@ public class Lexicon {
 			do {
 				lexeme.append(character);
 				character = fLoader.getNextChar();
+				if (Character.isWhitespace(character)) {
+					fLoader.resetLastChar();
+					break;
+				}
 			} while(Character.isLetter(character) || Character.isDigit(character) || character == '_');
-			if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
+			if (character == ';') {
+				fLoader.resetLastChar();
+			} else if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_' && !Character.isWhitespace(character)) {
 				lexeme.append(character);
 				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
 				return this.nextToken();
 			}
-			fLoader.resetLastChar();
 		} catch (EOFException e) {
 			if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
 				lexeme.append(character);
@@ -214,7 +219,9 @@ public class Lexicon {
 					character = fLoader.getNextChar();
 				}
 			}
-			if (Character.isLetter(character)) {
+			if (character == ';') {
+				fLoader.resetLastChar();
+			} else if (Character.isLetter(character)) {
 				lexeme.append(character);
 				errors.addErro("Erro Literal Numerico: Caractere '" + character + "' nao e valido", lexeme.toString(), line, column);
 				return this.nextToken();

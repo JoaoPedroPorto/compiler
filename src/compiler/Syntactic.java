@@ -27,19 +27,19 @@ public class Syntactic {
 	}
 	
 	public void process() throws IOException {
-		// int id = 1;
+		/*int id = 1;
 		// SOLICITA O PROXIMO TOKEN PARA O ANALISADOR LEXICO
-		// Token token = lexicon.nextToken();
+		Token token = lexicon.nextToken();
 		// PRINTA OS TOKENS GERADOS
-		/*System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------");
+		System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println("                                                                   TOKENS GERADOS                                                                   ");
         System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.printf("%5s %15s %20s %60s", "#", "POS(x,y)", "LEXEMA", "TOKEN");
-        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");*/
-		//token.printToken(id);
+        System.out.println("\n\n---------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
+		// token.printToken(id);
 		// CASO O 1 TOKEN GERADO PELO LEXICO NAO SEJA O FIM DO ARQUIVO O ANALISADOR SINTATICO 
 		// FICA PEDINDO TOKENS PARA O LEXICO ATE QUE CHEGUE UM TOKEN QUE SEJA O FIM DO ARQUIVO
-		/*while (token.getType() != TokenType.EOF) {
+		while (token.getType() != TokenType.EOF) {
 			// PRINTA O TOKEN GERADO
 			token.printToken(id);
 			id++;
@@ -50,12 +50,12 @@ public class Syntactic {
 		derivaS();
 		
 		// PRINTA A TABELA DE SIMBOLOS
-		TabSymbols.getInstance().printTabSymbols();
+		// TabSymbols.getInstance().printTabSymbols();
 		// PRINTA OS ERROS GERADOS NA VERIFICACAO, CASO HAJA
 		ErrorHandler.getInstance().errorReport();
 	}
 	
-	private void reSyncFollow(NonTerm nt) {
+	/*private void reSyncFollow(NonTerm nt) {
 		try {
 			Token token = null;
 			do {
@@ -75,630 +75,993 @@ public class Syntactic {
 			lexicon.storeToken(token);
 		} catch (IOException e) {
 		}
-	}
+	}*/
 
 	public void derivaS() throws IOException {
 		Token token = lexicon.nextToken();
 		if (FirstFollow.getInstance().isInFirst(NonTerm.S, token)) {
 			token = lexicon.nextToken();
-			if (token.getType() == TokenType.ID)
-				token = lexicon.nextToken();
-			
-		} else if (FirstFollow.getInstance().isInFollow(NonTerm.S, token)) {
-			
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 		}
-		
-		
-		
-		
-		if (token.getType() != TokenType.PROGRAM) {
+		if (token.getType() == TokenType.ID) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			reSyncFollow(NonTerm.S);
 		}
-		token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.ID)
+		if (token.getType() == TokenType.TERM) {
 			token = lexicon.nextToken();
-		else 
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.TERM)
-			token = lexicon.nextToken();
-		else 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.BEGIN || token.getType() == TokenType.DECLARE || token.getType() == TokenType.IF || token.getType() == TokenType.ID || token.getType() == TokenType.FOR ||
-				token.getType() == TokenType.WHILE) {
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.BLOCO, token)) {
 			lexicon.storeToken(token);
 			derivaBloco();
 			token = lexicon.nextToken();
-		} else
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.END_PROG)
+		}
+		if (token.getType() == TokenType.END_PROG) {
 			token = lexicon.nextToken();
-		else 
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.TERM)
+		}
+		if (token.getType() == TokenType.TERM) {
 			token = lexicon.nextToken();
-		else
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
 	}
 	
-	@SuppressWarnings("unused")
+	
+	
+	
 	public void derivaCmds() throws IOException {
 		Token token = lexicon.nextToken();
-		
 		if (token.getType() == TokenType.DECLARE) {
 			lexicon.storeToken(token);
 			derivaDecl();
-			derivaCmds();// Conversa com o grupo
-		} else if (token.getType() == TokenType.IF) {
+			derivaCmds();
+			return;
+		}
+		if (token.getType() == TokenType.IF) {
 			lexicon.storeToken(token);
 			derivaCond();
-			derivaCmds();// Conversa com o grupo
-		} else if (token.getType() == TokenType.FOR) {
+			derivaCmds();
+			return;
+		}
+		if (token.getType() == TokenType.FOR) {
 			lexicon.storeToken(token);
 			derivaRepF();
-			derivaCmds();// Conversa com o grupo
-		} else if (token.getType() == TokenType.WHILE) {
+			derivaCmds();
+			return;
+		}
+		if (token.getType() == TokenType.WHILE) {
 			lexicon.storeToken(token);
 			derivaRepW();
-			derivaCmds();// Conversa com o grupo
-		} else if (token.getType() == TokenType.ID) {
+			derivaCmds();
+			return;
+		}
+		if (token.getType() == TokenType.ID) {
 			lexicon.storeToken(token);
 			derivaAtrib();
-			derivaCmds();// Conversa com o grupo
-		} else if (token == null) {
+			derivaCmds();
+			return;
+		}
+		if (FirstFollow.getInstance().isInFollow(NonTerm.CMDS, token)) {
+			token = lexicon.nextToken();
 			lexicon.storeToken(token);
-			token = lexicon.nextToken();  // <-------------- validar com o grupo
-			if (token.getType() != TokenType.END)
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaCmd() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.DECLARE) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.DECL, token)) {
 			lexicon.storeToken(token);
 			derivaDecl();
-		} else if (token.getType() == TokenType.IF) {
+			return;
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.COND, token)) {
 			lexicon.storeToken(token);
 			derivaCond();
-		} else if (token.getType() == TokenType.FOR || token.getType() == TokenType.WHILE) {
+			return;
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.REP, token)) {
 			lexicon.storeToken(token);
 			derivaRep();
-		} else if (token.getType() == TokenType.ID) {
+			return;
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.ATRIB, token)) {
 			lexicon.storeToken(token);
 			derivaAtrib();
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
 	public void derivaAtrib() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.ID)
+		if (FirstFollow.getInstance().isInFirst(NonTerm.ATRIB, token)) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		
-		
+		}
+		if (token.getType() == TokenType.ASSIGN) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXP, token)) {
+			lexicon.storeToken(token);
+			derivaExp();
+			token = lexicon.nextToken();
+			lexicon.storeToken(token);
+			return;
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (token.getType() == TokenType.TERM) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
 	}
 	
 	public void derivaDecl() throws IOException {
 		Token token = lexicon.nextToken();
-
-		if(token.getType() == TokenType.DECLARE){
+		if (FirstFollow.getInstance().isInFirst(NonTerm.DECL, token)) {
 			token = lexicon.nextToken();
-		}
-		else{
+		} else { 
+			// TENTAR SE RECUPERAR 
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 		}
-		if(token.getType() == TokenType.ID){
+		if (token.getType() == TokenType.ID) {
 			token = lexicon.nextToken();
-		}
-		else{
+		} else {
+			// TENTAR SE RECUPERAR 
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 		}
-		if(token.getType() == TokenType.TYPE){
+		if (token.getType() == TokenType.TYPE) {
 			token = lexicon.nextToken();
-		}
-		else{
+		} else {
+			// TENTAR SE RECUPERAR 
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 		}
-		if(token.getType() == TokenType.TERM){
-			token = lexicon.nextToken();
+		if (token.getType() == TokenType.TERM) {
+			return;
 		}
-		else{
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
+		// TENTAR SE RECUPERAR 
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaCond() throws IOException {
 		Token token = lexicon.nextToken();
 		
-		if (token.getType() == TokenType.IF)
+		if (FirstFollow.getInstance().isInFirst(NonTerm.COND, token)) {
 			token = lexicon.nextToken();
-		else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.L_PAR)
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (token.getType() == TokenType.L_PAR) {
 			token = lexicon.nextToken();
-		else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.L_PAR)
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPLO, token)) {
+			lexicon.storeToken(token);
+			derivaExpLo();
 			token = lexicon.nextToken();
-		else
+		} else {
+			// TENTAR SE RECUPERAR 
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	@SuppressWarnings("unused")
-	public void derivaCndb() throws IOException {
-		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.BEGIN || token.getType() == TokenType.DECLARE || token.getType() == TokenType.IF || token.getType() == TokenType.ID || token.getType() == TokenType.FOR ||
-				token.getType() == TokenType.WHILE) {
+		}
+		if (token.getType() == TokenType.R_PAR) {
+			token = lexicon.nextToken();	
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (token.getType() == TokenType.THEN) {
+			token = lexicon.nextToken();	
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.BLOCO, token)) {
 			lexicon.storeToken(token);
 			derivaBloco();
-		} else if (token == null) {
-			lexicon.storeToken(token);
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.DECLARE || token.getType() != TokenType.IF || token.getType() != TokenType.FOR || token.getType() != TokenType.WHILE ||
-					token.getType() != TokenType.ID || token.getType() != TokenType.END || token.getType() != TokenType.END_PROG || token.getType() != TokenType.ELSE)		
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.CNDB, token)) {
+			lexicon.storeToken(token);
+			derivaCndb();
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR 
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	}
+	
+	public void derivaCndb() throws IOException {
+		Token token = lexicon.nextToken();
+		if (FirstFollow.getInstance().isInFirst(NonTerm.CNDB, token)) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.BLOCO, token)) {
+				lexicon.storeToken(token);
+				derivaBloco();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.CNDB, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		lexicon.storeToken(token);
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaExp() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() != TokenType.LOGIC_VAL || token.getType() != TokenType.ID || token.getType() != TokenType.NUM_INT || token.getType() != TokenType.NUM_FLOAT ||
-				token.getType() != TokenType.LITERAL || token.getType() != TokenType.L_PAR)		
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		if (token.getType() == TokenType.LOGIC_VAL) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)){
+				lexicon.storeToken(token);
+				derivaFValLog();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			}
+			return;
+		}
+		if (token.getType() == TokenType.ID) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FID, token)) {
+				lexicon.storeToken(token);
+				derivaFId();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			}
+			return;
+		}
+		if (token.getType() == TokenType.NUM_INT) {
+			derivaFNumInt();
+			return;
+		}
+		if (token.getType() == TokenType.NUM_FLOAT) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FNUMFLOAT, token)) {
+				lexicon.storeToken(token);
+				derivaFNumFloat();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
+		}
+		if (token.getType() == TokenType.L_PAR) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FLPAR, token)) {
+				lexicon.storeToken(token);
+				derivaFLPar();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
+		}
+		if (token.getType() == TokenType.LITERAL) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaFId() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.LOGIC_OP) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
 			lexicon.storeToken(token);
 			derivaFValLog();
-		} else if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-			derivaExpNum();
-		} else
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FOPNUM, token)) {
+				lexicon.storeToken(token);			
+				derivaFOpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
 	}
 	
 	public void derivaFOpNum() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaExpNum();
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	@SuppressWarnings("unused")
-	public void derivaFExpNum1() throws IOException {
-		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.RELOP) {
-			lexicon.storeToken(token);
-			derivaExpNum();		
-		} else if (token == null) {
-			lexicon.storeToken(token);
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.TERM)	{	
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-			}
-		} else 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	@SuppressWarnings("unused")
-	public void derivaFNumInt() throws IOException {
-		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
-			lexicon.storeToken(token);
-			derivaOpNum();
-			derivaFOpNum1();
-		} else if (token == null) {
-			lexicon.storeToken(token);
-			token = lexicon.nextToken();
-			if (token.getType() != TokenType.TERM) {	
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM1, token)) {
+				lexicon.storeToken(token);
+				derivaFExpNum1();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			}
-		} else
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+	}
+	
+	public void derivaFExpNum1() throws IOException {
+		Token token = lexicon.nextToken();
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM1, token)) {	
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM1, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	}
+	
+	public void derivaFNumInt() throws IOException {
+		Token token = lexicon.nextToken();
+		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
+			lexicon.storeToken(token);
+			derivaOpNum();
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FOPNUM1, token)){
+				lexicon.storeToken(token);
+				derivaFOpNum1();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FNUMINT, token)) {
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaFOpNum1() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaExpNum();
-		} else
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM2, token)){
+			lexicon.storeToken(token);
+			derivaFExpNum2();
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	@SuppressWarnings("unused")
 	public void derivaFExpNum2() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.RELOP) {
-			lexicon.storeToken(token);
-			derivaExpNum();		
-		} else if (token == null) {
-			lexicon.storeToken(token);
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM2, token)) {
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.TERM)	{	
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			}
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM2, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	@SuppressWarnings("unused")
 	public void derivaFNumFloat() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-			derivaFOpNum2();
-		} else if (token == null) {
-			lexicon.storeToken(token);
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.TERM)
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FOPNUM2, token)) {
+				lexicon.storeToken(token);
+				derivaFOpNum2();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
+			}
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FNUMFLOAT, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaFOpNum2() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaExpNum();
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM3, token)){
+				lexicon.storeToken(token);
+				derivaFExpNum3();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	@SuppressWarnings("unused")
 	public void derivaFExpNum3() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.RELOP) {
-			lexicon.storeToken(token);
-			derivaExpNum();		
-		} else if (token == null) {
-			lexicon.storeToken(token);
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM3, token)) {
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.TERM)	{	
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());			
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			}
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM3, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaFLPar() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FLPAR, token)) {
 			lexicon.storeToken(token);
 			derivaExpNum();
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaFExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
+			}
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaFExpNum() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() != TokenType.R_PAR)		
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token)) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FRPAR, token)) {
+				lexicon.storeToken(token);
+				derivaFRPar();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
+			}
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	@SuppressWarnings("unused")
 	public void derivaFRPar() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.RELOP) {
-			lexicon.storeToken(token);
-			derivaExpNum();		
-		} else if (token == null) {
-			lexicon.storeToken(token);
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FRPAR, token)) {
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.TERM)	{	
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());			
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();	
+				token = lexicon.nextToken();			
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
 			}
-		} else 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FRPAR, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaFId1() throws IOException {
 		Token token = lexicon.nextToken();
-
-		if(token.getType() == TokenType.LOGIC_OP || token == null){
-			if (token == null) {  // METODO VALIDAR FOLLOW
-				token = lexicon.nextToken();
-				if (token.getType() == TokenType.TERM ) { // METODO VALIDAR FOLLOW
-					if(token.getType() == TokenType.R_PAR){
-						derivaFValLog();
-					}
-				} else {
-					errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-				}
-			}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
 			lexicon.storeToken(token);
 			derivaFValLog();
+			token = lexicon.nextToken();
+			return;
 		}
-
-        else if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID
-				|| token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT){
+		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
-				lexicon.storeToken(token);
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);			
 				derivaExpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
 			if (token.getType() == TokenType.RELOP) {
 				token = lexicon.nextToken();
-			} else
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
 				lexicon.storeToken(token);
 				derivaExpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
 		}
-
-        else{
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		if (token.getType() == TokenType.RELOP) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
 		}
-
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	@SuppressWarnings("unused")
 	public void derivaFValLog() throws IOException {
 		Token token = lexicon.nextToken();
-		if (token.getType() == TokenType.LOGIC_OP) {
-			lexicon.storeToken(token);
-			derivaExpLo();
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPLO, token)) {
+				lexicon.storeToken(token);
+				derivaExpLo();
+				token = lexicon.nextToken();
+				return;
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
+			}
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FVALLOG, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
-	@SuppressWarnings("unused")
 	public void derivaXExpNum() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 			lexicon.storeToken(token);
 			derivaOpNum();
-			derivaExpNum();
-		} else if (token == null) {
-			lexicon.storeToken(token);
 			token = lexicon.nextToken();
-			if (token.getType() != TokenType.RELOP || token.getType() != TokenType.TO || token.getType() != TokenType.BEGIN || token.getType() != TokenType.DECLARE ||
-					token.getType() != TokenType.IF || token.getType() != TokenType.ID || token.getType() != TokenType.FOR ||
-					token.getType() != TokenType.WHILE || token.getType() != TokenType.TERM || token.getType() != TokenType.R_PAR)
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
+		} else if (FirstFollow.getInstance().isInFollow(NonTerm.XEXPNUM, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
 	
 	public void derivaOpNum() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() != TokenType.ARIT_AS || token.getType() != TokenType.ARIT_MD)
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());		
 	}
 	
 	public void derivaVal() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() != TokenType.ID || token.getType() != TokenType.NUM_INT || token.getType() != TokenType.NUM_FLOAT)
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		if (FirstFollow.getInstance().isInFirst(NonTerm.VAL, token)) {
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
 	public void derivaRep() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.FOR) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.REPF, token)) {
 			lexicon.storeToken(token);
 			derivaRepF();
-		} else if (token.getType() == TokenType.WHILE) {
+			token = lexicon.nextToken();
+			return;
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.REPW, token)) {
 			lexicon.storeToken(token);
 			derivaRepW();
-		} else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
 	public void derivaRepF() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() != TokenType.FOR)
+		if (FirstFollow.getInstance().isInFirst(NonTerm.REPF, token)) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (token.getType() == TokenType.ID) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (token.getType() == TokenType.ASSIGN) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR 
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+			lexicon.storeToken(token);
+			derivaExpNum();
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (token.getType() == TokenType.TO) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+			lexicon.storeToken(token);
+			derivaExpNum();
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.BLOCO, token)) {
+			lexicon.storeToken(token);
+			derivaBloco();
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
 	}
 	
 	public void derivaExpNum() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.VAL, token)) {
 			lexicon.storeToken(token);
 			derivaVal();
-		} else if (token.getType() != TokenType.L_PAR)
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.XEXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaXExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
+			}
+			return;
+		}
+		if (token.getType() == TokenType.L_PAR) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivaExpNum();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			if (token.getType() == TokenType.R_PAR) {
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 	}
-	
 	
 	public void derivaRepW() throws IOException {
 		Token token = lexicon.nextToken();
-		
-		if (token.getType() != TokenType.WHILE)
+		if (FirstFollow.getInstance().isInFirst(NonTerm.REPW, token)) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (token.getType() == TokenType.L_PAR) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPLO, token)) {
+				lexicon.storeToken(token);
+				derivaExpLo();
+				token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (token.getType() == TokenType.R_PAR) {
+			token = lexicon.nextToken();
+		} else {
+			// TENTAR SE RECUPERAR
+			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+		}
+		if (FirstFollow.getInstance().isInFirst(NonTerm.BLOCO, token)) {
+			lexicon.storeToken(token);
+			derivaBloco();
+			token = lexicon.nextToken();
+			return;
+		}
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
 	}
 	
 	public void derivaExpLo() throws IOException {
 		Token token = lexicon.nextToken();
-
 		if (token.getType() == TokenType.LOGIC_VAL) {
 			token = lexicon.nextToken();
-
-			if (token.getType() == TokenType.LOGIC_OP || token == null) {
-				if (token == null) {  // METODO VALIDAR FOLLOW
-					token = lexicon.nextToken();
-					if (token.getType() == TokenType.TERM ) { // METODO VALIDAR FOLLOW
-						if(token.getType() == TokenType.R_PAR){
-							derivaFValLog();
-						}
-					} else {
-						errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-					}
-				}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)){
 				lexicon.storeToken(token);
 				derivaFValLog();
+				token = lexicon.nextToken();
 			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;
 			}
+			return;
 		}
-
-		else if (token.getType() == TokenType.ID) {
+		if (token.getType() == TokenType.ID) {
 			token = lexicon.nextToken();
-
-			if (token.getType() == TokenType.RELOP || token.getType() == TokenType.LOGIC_OP ||
-					token.getType() == TokenType.ARIT_AS || token.getType() == TokenType.ARIT_MD || token == null) {
-				if (token == null) {  // METODO VALIDAR FOLLOW
-					token = lexicon.nextToken();
-					if (token.getType() == TokenType.TERM ) { // METODO VALIDAR FOLLOW
-						if(token.getType() == TokenType.R_PAR){
-							derivaFId1();
-						}
-					} else {
-						errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-					}
-				}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FID1, token)){
 				lexicon.storeToken(token);
 				derivaFId1();
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				return;	
 			}
+			return;
 		}
-
-		else if (token.getType() == TokenType.NUM_INT) {
+		if (token.getType() == TokenType.NUM_INT) {
 			token = lexicon.nextToken();
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID
-					|| token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 				lexicon.storeToken(token);
 				derivaOpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-			     || token.getType() == TokenType.NUM_FLOAT) {
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
 				lexicon.storeToken(token);
 				derivaExpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
 			if (token.getType() == TokenType.RELOP) {
 				token = lexicon.nextToken();
-			} else
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
 				lexicon.storeToken(token);
 				derivaExpNum();
-			} else
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-
-		}
-
-		else if (token.getType() == TokenType.NUM_FLOAT) {
-			token = lexicon.nextToken();
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID
-					|| token.getType() == TokenType.NUM_INT || token.getType() == TokenType.NUM_FLOAT) {
 				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
+		} 
+		if (token.getType() == TokenType.NUM_FLOAT) {
+			token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
+				lexicon.storeToken(token);
 				derivaOpNum();
-			} else
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
 				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
 				derivaExpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
 			if (token.getType() == TokenType.RELOP) {
 				token = lexicon.nextToken();
-			} else
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
-				token = lexicon.nextToken();
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
 				derivaExpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
 		}
-
-		else if (token.getType() == TokenType.L_PAR) {
+		if (token.getType() == TokenType.L_PAR) {
 			token = lexicon.nextToken();
-
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
-				token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
 				derivaExpNum();
-			}  else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
 			if (token.getType() == TokenType.R_PAR) {
 				token = lexicon.nextToken();
-			} else
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
 			if (token.getType() == TokenType.RELOP) {
 				token = lexicon.nextToken();
-			} else
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			if (token.getType() == TokenType.L_PAR || token.getType() == TokenType.ID || token.getType() == TokenType.NUM_INT
-					|| token.getType() == TokenType.NUM_FLOAT) {
-				token = lexicon.nextToken();
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
 				derivaExpNum();
-			} else
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
 				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			return;
 		}
-
-		else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-
+		// TENTAR SE RECUPERAR
+		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol()); 
 	}
 
 	public void derivaBloco() throws IOException {
 		Token token = lexicon.nextToken();
-
-
-		if (token.getType() == TokenType.BEGIN)
+		if (token.getType() == TokenType.BEGIN) {
 			token = lexicon.nextToken();
-		else
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		if (token.getType() == TokenType.DECLARE || token.getType() == TokenType.IF || token.getType() == TokenType.FOR || token.getType() == TokenType.WHILE
-				|| token.getType() == TokenType.ID || token == null) {
-			lexicon.storeToken(token);
-			derivaCmds();
-			token = lexicon.nextToken();
-		} else{
+			if (token == null || FirstFollow.getInstance().isInFirst(NonTerm.CMDS, token)) {
+				lexicon.storeToken(token);
+				derivaCmds();
+				//TODO: VER token = lexicon.nextToken();
+				return;
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+			if (token.getType() == TokenType.END) {
+				token = lexicon.nextToken();
+			} else {
+				// TENTAR SE RECUPERAR
+				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			}
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 		}
-		if (token.getType() == TokenType.END)
-			token = lexicon.nextToken();
-		else 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-
-		// Conversar com o GRUPO !!!!!!!!!!
-		if (token.getType() == TokenType.ID || token.getType() == TokenType.DECLARE || token.getType() == TokenType.IF || token.getType() == TokenType.FOR || token.getType() == TokenType.WHILE) {
+		if (FirstFollow.getInstance().isInFirst(NonTerm.CMD, token)) {
 			lexicon.storeToken(token);
 			derivaCmd();
 			token = lexicon.nextToken();
-		} else
+		} else {
+			// TENTAR SE RECUPERAR
 			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+		}
 	}
 }
