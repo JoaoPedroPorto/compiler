@@ -258,58 +258,239 @@ public  class FirstFollow {
 		 list = new ArrayList<>();
 		 list.add(TokenType.TERM);
 		 follow.put(NonTerm.FRPAR, list);
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
+
+		// FIRST FID1
+		list = new ArrayList<>();
+		list.add(TokenType.RELOP);
+		list.add(TokenType.LOGIC_OP);
+		list.add(TokenType.ARIT_AS);
+		list.add(TokenType.ARIT_MD);
+		first.put(NonTerm.FID1, list);
+		// FOLLOW FID1
+		list = new ArrayList<>();
+		list.add(TokenType.TERM);
+		list.add(TokenType.R_PAR);
+		follow.put(NonTerm.FID1, list);
+
+		// FIRST FVALLOG
+		list = new ArrayList<>();
+		list.add(TokenType.LOGIC_OP);
+		first.put(NonTerm.FVALLOG, list);
+		// FOLLOW FVALLOG
+		list = new ArrayList<>();
+		list.add(TokenType.TERM);
+		list.add(TokenType.R_PAR);
+		follow.put(NonTerm.FVALLOG, list);
+
+		// FIRST XEXPNUM
+		list = new ArrayList<>();
+		list.add(TokenType.ARIT_AS);
+		list.add(TokenType.ARIT_MD);
+		first.put(NonTerm.XEXPNUM, list);
+		// FOLLOW XEXPNUM
+		list = new ArrayList<>();
+		list.add(TokenType.RELOP);
+		list.add(TokenType.TO);
+		list.add(TokenType.BEGIN);
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.ID);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.TERM);
+		list.add(TokenType.R_PAR);
+		follow.put(NonTerm.XEXPNUM, list);
+
+		// FIRST OPNUM
+		list = new ArrayList<>();
+		list.add(TokenType.ARIT_AS);
+		list.add(TokenType.ARIT_MD);
+		first.put(NonTerm.OPNUM, list);
+		// FOLLOW OPNUM
+		list = new ArrayList<>();
+		list.add(TokenType.L_PAR);
+		list.add(TokenType.ID);
+		list.add(TokenType.NUM_INT);
+		list.add(TokenType.NUM_FLOAT);
+		follow.put(NonTerm.OPNUM, list);
+
+		// FIRST VAL
+		list = new ArrayList<>();
+		list.add(TokenType.ID);
+		list.add(TokenType.NUM_INT);
+		list.add(TokenType.NUM_FLOAT);
+		first.put(NonTerm.VAL, list);
+		// FOLLOW VAL
+		list = new ArrayList<>();
+		list.add(TokenType.ARIT_AS);
+		list.add(TokenType.ARIT_MD);
+		list.add(TokenType.RELOP);
+		list.add(TokenType.TO);
+		list.add(TokenType.BEGIN);
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.ID);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.TERM);
+		list.add(TokenType.R_PAR);
+		follow.put(NonTerm.VAL, list);
+
+		// FIRST REP
+		list = new ArrayList<>();
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		first.put(NonTerm.REP, list);
+		// FOLLOW REP
+		list = new ArrayList<>();
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.ID);
+		list.add(TokenType.END);
+		list.add(TokenType.END_PROG);
+		list.add(TokenType.ELSE);
+		follow.put(NonTerm.REP, list);
+
+		// FIRST REPF
+		list = new ArrayList<>();
+		list.add(TokenType.FOR);
+		first.put(NonTerm.REPF, list);
+		// FOLLOW REPF
+		list = new ArrayList<>();
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.ID);
+		list.add(TokenType.END);
+		list.add(TokenType.END_PROG);
+		list.add(TokenType.ELSE);
+		follow.put(NonTerm.REPF, list);
+
+		// FIRST EXPNUM
+		list = new ArrayList<>();
+		list.add(TokenType.L_PAR);
+		list.add(TokenType.ID);
+		list.add(TokenType.NUM_INT);
+		list.add(TokenType.NUM_FLOAT);
+		first.put(NonTerm.EXPNUM, list);
+		// FOLLOW EXPNUM
+		list = new ArrayList<>();
+		list.add(TokenType.RELOP);
+		list.add(TokenType.TO);
+		list.add(TokenType.BEGIN);
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.ID);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.TERM);
+		list.add(TokenType.R_PAR);
+		follow.put(NonTerm.EXPNUM, list);
+
+		// FIRST REPW
+		list = new ArrayList<>();
+		list.add(TokenType.WHILE);
+		first.put(NonTerm.REPW, list);
+		// FOLLOW REPW
+		list = new ArrayList<>();
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.ID);
+		list.add(TokenType.END);
+		list.add(TokenType.END_PROG);
+		list.add(TokenType.ELSE);
+		follow.put(NonTerm.REPW, list);
+
+		// FIRST EXPLO
+		list = new ArrayList<>();
+		list.add(TokenType.LOGIC_VAL);
+		list.add(TokenType.ID);
+		list.add(TokenType.NUM_INT);
+		list.add(TokenType.NUM_FLOAT);
+		list.add(TokenType.L_PAR);
+		first.put(NonTerm.EXPLO, list);
+		// FOLLOW EXPLO
+		list = new ArrayList<>();
+		list.add(TokenType.TERM);
+		list.add(TokenType.R_PAR);
+		follow.put(NonTerm.EXPLO, list);
+
+		// FIRST BLOCO
+		list = new ArrayList<>();
+		list.add(TokenType.BEGIN);
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.ID);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		first.put(NonTerm.BLOCO, list);
+		// FOLLOW BLOCO
+		list = new ArrayList<>();
+		list.add(TokenType.DECLARE);
+		list.add(TokenType.IF);
+		list.add(TokenType.FOR);
+		list.add(TokenType.WHILE);
+		list.add(TokenType.ID);
+		list.add(TokenType.END);
+		list.add(TokenType.END_PROG);
+		list.add(TokenType.ELSE);
+		follow.put(NonTerm.BLOCO, list);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 	
 	public Map<NonTerm, List<TokenType>> getFirst() {
