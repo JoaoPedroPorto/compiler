@@ -1,8 +1,59 @@
 program TESTE_01;
+
     begin
+
         declare var_1 int;
+
+        declare var_2 int;
+
+        declare var_3 int;
+
+        declare var_4 text;
+
+        declare var_5 bool;
+
+        declare var_6 float;
+
                 
+
         var_1 <- 10;
-        		
+
+        var_2 <- var_1 + 100;
+
+        var_4 <- "Variavel 2 eh do tipo texto";
+
+        var_5 <- false;
+
+        
+
+        if (var_1 $gt var_2) then
+
+            begin
+
+                var_4 <- "var_1 eh maior que var_2";
+
+                var_5 <- true;
+
+            end
+
+        else
+
+            begin
+
+                var_4 <- "var_2 eh maior que var_1";
+
+                var_5 <- false;
+
+            end
+
+        for var_3 <- var_2 to (var_1 * var_2)
+
+            begin
+
+                var_6 <- var_6 + var_3;
+
+            end            
+
      end
+
 end_prog;
