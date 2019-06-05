@@ -161,7 +161,7 @@ public class Lexicon {
 					break;
 				}
 			} while(Character.isLetter(character) || Character.isDigit(character) || character == '_');
-			if (character == ';') {
+			if (character == ';' || character == '(' || character == ')') {
 				fLoader.resetLastChar();
 			} else if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_' && !Character.isWhitespace(character)) {
 				lexeme.append(character);
@@ -219,7 +219,7 @@ public class Lexicon {
 					character = fLoader.getNextChar();
 				}
 			}
-			if (character == ';') {
+			if (character == ';'  || character == '(' || character == ')') {
 				fLoader.resetLastChar();
 			} else if (Character.isLetter(character)) {
 				lexeme.append(character);
