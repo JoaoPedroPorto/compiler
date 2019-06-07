@@ -13,7 +13,6 @@ program TESTE_01;
         declare var_5 bool;
 
         declare var_6 float;
-        declare var_6 text;
 
                 
         var_1 <- 10;
