@@ -19,16 +19,18 @@ public class ErrorReport {
     private String lexeme;
     private long line;
     private long column;
+    private String type;
 
-    public static  ErrorReport Create(String description, String lexeme, long line, long column) {
-        return new ErrorReport(description, lexeme, line, column);
+    public static  ErrorReport Create(String description, String lexeme, long line, long column, String type) {
+        return new ErrorReport(description, lexeme, line, column, type);
     }
 
-    private ErrorReport(String description, String lexeme, long line, long column) {
+    private ErrorReport(String description, String lexeme, long line, long column, String type) {
         this.description = description;
         this.lexeme = lexeme;
         this.line = line;
         this.column = column;
+        this.type = type;
     }
 
     // GETTERS AND SETTERS
@@ -57,6 +59,12 @@ public class ErrorReport {
 	public void setColumn(long column) {
         this.column = column;
     }
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }
 

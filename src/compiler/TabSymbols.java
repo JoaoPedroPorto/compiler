@@ -50,7 +50,6 @@ public class TabSymbols {
 		return instance;
 	}
 	
-	
 	// CHAMADA PELO ANALISADOR LEXICO PARA ADICIONAR UM ID
 	public Token addID(String lexeme, long lin, long col) {
 		Token token = table.get(lexeme);
@@ -63,6 +62,16 @@ public class TabSymbols {
 		token.setCol(col);
 		token.setLin(lin);
 		return token;
+	}
+	
+	public void setDeclared(Token token) {
+        table.get(token.getLexeme()).setChecked(true);
+    }
+	
+	public boolean verifyIfChecked(Token token) {
+		if (table.get(token.getLexeme()).getChecked())
+			return true;
+		return false;
 	}
 
 	// FUNCAO RESPONSAVEL POR PRINTAR NA TELA TODOS OS SIMBOLOS

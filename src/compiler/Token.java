@@ -18,6 +18,7 @@ public class Token {
 	private String lexeme;
 	private long lin;
 	private long col;
+	private boolean checked;
 
 	public Token(TokenType type, String lexeme, long lin, long col) {
 		this.type = type;
@@ -56,6 +57,12 @@ public class Token {
 	}
 	public void setCol(long col) {
 		this.col = col;
+	}
+	public boolean getChecked() {
+		return checked;
+	}
+	public void setChecked(boolean checked) {
+		this.checked = checked;
 	}
 
 	public void printToken(int id) {

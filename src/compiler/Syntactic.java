@@ -19,7 +19,6 @@ public class Syntactic {
 	
 	private Lexicon lexicon;
 	private ErrorHandler errors = ErrorHandler.getInstance();
-	// private First _first = First.getInstance();
 	
 	// INTANCIA O ANALISADOR LEXICO E PASSA NO CONSTRUTOR O ARQUIVO A SER VERIFICADO
 	public Syntactic(String fileName) throws IOException {
@@ -47,7 +46,7 @@ public class Syntactic {
 			token = lexicon.nextToken();
 		}*/
 		
-		derivaS();
+		derivationS();
 		
 		// PRINTA A TABELA DE SIMBOLOS
 		// TabSymbols.getInstance().printTabSymbols();
@@ -78,747 +77,624 @@ public class Syntactic {
 	}*/
 	
 	private void reSyncS() throws IOException {
-		Token token = lexicon.nextToken();
-		while (!token.getType().equals(TokenType.TERM) && !token.getType().equals(TokenType.BEGIN) || token.getType().equals(TokenType.EOF)) {
-			token = lexicon.nextToken();
-		}
-		lexicon.storeToken(token);
+		try {
+			Token token = lexicon.nextToken();
+			while ((!FirstFollow.getInstance().isInFirst(NonTerm.CMD, token) && !token.getType().equals(TokenType.BEGIN)) || token.getType().equals(TokenType.EOF)) {
+				token = lexicon.nextToken();
+			}
+			lexicon.storeToken(token);
+		} catch (Exception e) {}
 	}
 
-	// -> program id term BLOCO end_prog term						
-	public void derivaS() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.S, token)) {
+	// -> program id term BLOCO end_prog term	
+	private void derivationS() throws IOException {
+		try {
+			boolean hasError = false;
+			Token token = lexicon.nextToken();
+			if (!FirstFollow.getInstance().isInFirst(NonTerm.S, token))
+				errors.addErro("Espera 'program'", token.getLexeme(), token.getLin(), token.getCol(), "S");
 			token = lexicon.nextToken();
-		} else { // TENTAR SE RECUPERAR
-			errors.addErro("Espera 'program'", token.getLexeme(), token.getLin(), token.getCol());
-			reSyncS();
+			if (!token.getType().equals(TokenType.ID))
+				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "S");
 			token = lexicon.nextToken();
-			if (token.getType().equals(TokenType.EOF)) {
+			if (!token.getType().equals(TokenType.TERM)) {
+				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "S");
+				if (!FirstFollow.getInstance().isInFirst(NonTerm.CMD, token) && !token.getType().equals(TokenType.BEGIN)) {
+					reSyncS();
+					token = lexicon.nextToken();
+				}
+				if (token.getType().equals(TokenType.EOF))
+					return;
+				lexicon.storeToken(token);
+				derivationBloco();
+				hasError = true;
+			}
+			if (!hasError)
+				derivationBloco();
+			token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.END_PROG))
+				errors.addErro("Espera 'end_prog'", token.getLexeme(), token.getLin(), token.getCol(), "S");
+			token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.TERM))
+				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "S");	
+		} catch (Exception e) {}
+	}
+
+	// -> DECL CMDS | COND CMDS | REPF CMDS | REPW CMDS | ATRIB CMDS | ε						
+	private void derivationCmds() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.DECL, token)) {
+				derivationDecl();
+				derivationCmds();
 				return;
 			}
-			derivaBloco();
-		}
-		if (token.getType() == TokenType.ID) {
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType() == TokenType.TERM) {
-			derivaBloco();
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType() == TokenType.END_PROG) {
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType() == TokenType.TERM) {
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-	}
-	
-	// -> DECL CMDS | COND CMDS | REPF CMDS | REPW CMDS | ATRIB CMDS | ε						
-	public void derivaCmds() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.DECLARE)) {
-			derivaDecl();
-			derivaCmds();
-			return;
-		}
-		if (token.getType().equals(TokenType.IF)) {
-			derivaCond();
-			derivaCmds();
-			return;
-		}
-		if (token.getType().equals(TokenType.FOR)) {
-			derivaRepF();
-			derivaCmds();
-			return;
-		}
-		if (token.getType().equals(TokenType.WHILE)) {
-			lexicon.storeToken(token);
-			derivaRepW();
-			derivaCmds();
-			return;
-		}
-		if (token.getType().equals(TokenType.ID)) {
-			// lexicon.storeToken(token);
-			derivaAtrib();
-			derivaCmds();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFollow(NonTerm.CMDS, token)) {
-			lexicon.storeToken(token);
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (FirstFollow.getInstance().isInFirst(NonTerm.COND, token)) {
+				derivationCond();
+				derivationCmds();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.REPF, token)) {
+				derivationRepF();
+				derivationCmds();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.REPW, token)) {
+				derivationRepW();
+				derivationCmds();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.ATRIB, token)) {
+				verifyIfIdDeclared(token, false);
+				derivationAtrib();
+				derivationCmds();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.CMDS, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ 'declare|if|for|while|ID|end|ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "CMDS");
+		} catch (Exception e) {}
 	}
 	
 	//  -> DECL | COND | REP | ATRIB						
-	public void derivaCmd() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.DECL, token)) {
-			lexicon.storeToken(token);
-			derivaDecl();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.COND, token)) {
-			lexicon.storeToken(token);
-			derivaCond();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.REP, token)) {
-			lexicon.storeToken(token);
-			derivaRep();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.ATRIB, token)) {
-			derivaAtrib();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+	private void derivationCmd() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.DECL, token)) {
+				derivationDecl();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.COND, token)) {
+				derivationCond();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.REP, token)) {
+				lexicon.storeToken(token);
+				derivationRep();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.ATRIB, token)) {
+				verifyIfIdDeclared(token, false);
+				derivationAtrib();
+				return;
+			}
+			errors.addErro("Espera [ 'declare|if|for|while|ID' ]", token.getLexeme(), token.getLin(), token.getCol(), "CMD");	
+		} catch (Exception e) {}
 	}
 	
 	//  -> id assign EXP term						
-	public void derivaAtrib() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.ASSIGN)) {
-			derivaExp();
+	private void derivationAtrib() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.ASSIGN))
+				errors.addErro("Espera '<-'", token.getLexeme(), token.getLin(), token.getCol(), "ATRIB");
+			derivationExp();
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-		if (token.getType().equals(TokenType.TERM)) {
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (!token.getType().equals(TokenType.TERM))
+				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "ATRIB");
+		} catch (Exception e) {}
 	}
 	
-	public void derivaDecl() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.ID)) {
+	private void verifyIfIdDeclared(Token token, boolean isDeclaration) throws IOException {
+		try {
+			if (!token.getType().equals(TokenType.ID))
+				return;
+			if (isDeclaration) {
+				if (TabSymbols.getInstance().verifyIfChecked(token)) {
+					errors.addErro("Variavel ja declarada", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+					return;
+				}
+				TabSymbols.getInstance().setDeclared(token);
+				return;
+			}
+			if (!TabSymbols.getInstance().verifyIfChecked(token))
+				errors.addErro("Variavel nao foi declarada", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+		} catch (Exception e) {}
+	}
+	
+	// -> declare id type term						
+	private void derivationDecl() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.ID))
+				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+			verifyIfIdDeclared(token, true);
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType().equals(TokenType.TYPE)) {
+			if (!token.getType().equals(TokenType.TYPE))
+				errors.addErro("Espera [ 'bool|text|int|float' ]", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType().equals(TokenType.TERM)) {
-			return;
-		}
-		// TENTAR SE RECUPERAR 
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (!token.getType().equals(TokenType.TERM))
+				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+		} catch (Exception e) {}
 	}
 	
 	// -> if l_par EXPLO r_par then BLOCO CNDB						
-	public void derivaCond() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.L_PAR)) {
-			derivaExpLo();
+	private void derivationCond() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.L_PAR))
+				errors.addErro("Espera '('", token.getLexeme(), token.getLin(), token.getCol(), "COND");
+			derivationExpLo();
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-		if (token.getType().equals(TokenType.R_PAR)) {
-			token = lexicon.nextToken();	
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType().equals(TokenType.THEN)) {
-			derivaBloco();
-			derivaCndb();
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
+			if (!token.getType().equals(TokenType.R_PAR))
+				errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "COND");
+			token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.THEN))
+				errors.addErro("Espera 'then'", token.getLexeme(), token.getLin(), token.getCol(), "COND");
+			derivationBloco();
+			derivationCndb();
+		} catch (Exception e) {}
 	}
 	
 	// -> else BLOCO | ε						
-	public void derivaCndb() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.CNDB, token)) {
-			derivaBloco();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFollow(NonTerm.CNDB, token)) {
-			lexicon.storeToken(token);
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	private void derivationCndb() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.CNDB, token)) {
+				derivationBloco();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.CNDB, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ 'else|declare|if|for|while|ID|end|end_prog|else', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "CNDB");
+		} catch (Exception e) {}
 	}
+	
 	// -> logic_val FVALLOG | id FID | num_int FNUMINT | num_float FNUMFLOAT | l_par FLPAR | literal						
-	public void derivaExp() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.LOGIC_VAL)) {
-			derivaFValLog();
-			return;
-		}
-		if (token.getType().equals(TokenType.ID)) {
-			derivaFId();
-			return;
-		}
-		if (token.getType().equals(TokenType.NUM_INT)) {
-			derivaFNumInt();
-			return;
-		}
-		if (token.getType().equals(TokenType.NUM_FLOAT)) {
-			derivaFNumFloat();
-			return;
-		}
-		if (token.getType().equals(TokenType.L_PAR)) {
-			derivaFLPar();
-			return;
-		}
-		if (token.getType().equals(TokenType.LITERAL)) {
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	private void derivationExp() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (token.getType().equals(TokenType.LOGIC_VAL)) {
+				derivationFValLog();
+				return;
+			}
+			if (token.getType().equals(TokenType.ID)) {
+				verifyIfIdDeclared(token, false);
+				derivationFId();
+				return;
+			}
+			if (token.getType().equals(TokenType.NUM_INT)) {
+				derivationFNumInt();
+				return;
+			}
+			if (token.getType().equals(TokenType.NUM_FLOAT)) {
+				derivationFNumFloat();
+				return;
+			}
+			if (token.getType().equals(TokenType.L_PAR)) {
+				derivationFLPar();
+				return;
+			}
+			if (token.getType().equals(TokenType.LITERAL)) {
+				return;
+			}
+			errors.addErro("Espera [ 'true|false', 'ID', 'n. inteiro', 'n. float', '(', 'texto' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXP");
+		} catch (Exception e) {}
 	}
 	
-	//  -> FVALLOG | OPNUM FOPNUM						
-	public void derivaFId() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
-			derivaFValLog();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaOpNum();
-			derivaFOpNum();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	// -> FVALLOG | OPNUM FOPNUM						
+	private void derivationFId() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
+				derivationFValLog();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationOpNum();
+				derivationFOpNum();
+				return;
+			}
+			errors.addErro("Espera [ 'and|not|or', '+|-|/|*' ]", token.getLexeme(), token.getLin(), token.getCol(), "FID");
+		} catch (Exception e) {}
 	}
 	
-	//  -> EXPNUM FEXPNUM_1						
-	public void derivaFOpNum() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
-			derivaFExpNum1();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	// -> EXPNUM FEXPNUM_1						
+	private void derivationFOpNum() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationExpNum();
+				derivationFExpNum1();
+				return;
+			}
+			errors.addErro("Espera [ '(|ID|n. inteiro|n. float' ]", token.getLexeme(), token.getLin(), token.getCol(), "FOPNUM");
+		} catch (Exception e) {}
+	}
+	
+	// -> relop EXPNUM | ε						
+	private void derivationFExpNum1() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM1, token)) {	
+				derivationExpNum();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM1, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df', ';', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FEXPNUM1");
+		} catch (Exception e) {}
+	}
+	
+	// -> OPNUM FOPNUM_1						
+	private void derivationFNumInt() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationOpNum();
+				derivationFOpNum1();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FNUMINT, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ '+|-|/|*', ';', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FNUMINT");
+		} catch (Exception e) {}
+	}
+	
+	// -> EXPNUM FEXPNUM_2						
+	private void derivationFOpNum1() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationExpNum();
+				derivationFExpNum2();
+				return;
+			}
+			errors.addErro("Espera [ '(|ID|n. inteiro|n. float' ]", token.getLexeme(), token.getLin(), token.getCol(), "FOPNUM1");
+		} catch (Exception e) {}
+	}
+	
+	// -> relop EXPNUM | ε						
+	private void derivationFExpNum2() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM2, token)) {
+				derivationExpNum();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM2, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df', ';', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FEXPNUM2");	
+		} catch (Exception e) {}
+	}
+	
+	// -> OPNUM FOPNUM_2											
+	private void derivationFNumFloat() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationOpNum();
+				derivationFOpNum2();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FNUMFLOAT, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ '+|-|/|*', ';', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FNUMFLOAT");
+		} catch (Exception e) {}
+	}
+	
+	// -> EXPNUM FEXPNUM_3						
+	private void derivationFOpNum2() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationExpNum();
+				derivationFExpNum3();
+				return;
+			}
+			errors.addErro("Espera [ '(|ID|n. inteiro|n. float' ]", token.getLexeme(), token.getLin(), token.getCol(), "FOPNUM2");
+		} catch (Exception e) {}
 	}
 	
 	//  -> relop EXPNUM | ε						
-	public void derivaFExpNum1() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM1, token)) {	
-			derivaExpNum();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM1, token)) {
-			lexicon.storeToken(token);
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	//  -> OPNUM FOPNUM_1						
-	public void derivaFNumInt() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaOpNum();
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.FOPNUM1, token)){
-				lexicon.storeToken(token);
-				derivaFOpNum1();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			}
-			return;
-		}
-		if (FirstFollow.getInstance().isInFollow(NonTerm.FNUMINT, token)) {
-			lexicon.storeToken(token);
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFOpNum1() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaExpNum();
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM2, token)){
-			lexicon.storeToken(token);
-			derivaFExpNum2();
-			token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFExpNum2() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM2, token)) {
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
-				lexicon.storeToken(token);
-				derivaExpNum();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			}
-		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM2, token)) {
-			token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFNumFloat() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaOpNum();
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.FOPNUM2, token)) {
-				lexicon.storeToken(token);
-				derivaFOpNum2();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	private void derivationFExpNum3() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM3, token)) {
+				derivationExpNum();
 				return;
 			}
-		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FNUMFLOAT, token)) {
-			token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFOpNum2() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaExpNum();
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM3, token)){
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM3, token)) {
 				lexicon.storeToken(token);
-				derivaFExpNum3();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			}
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFExpNum3() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM3, token)) {
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
-				lexicon.storeToken(token);
-				derivaExpNum();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			}
-		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FEXPNUM3, token)) {
-			token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFLPar() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FLPAR, token)) {
-			lexicon.storeToken(token);
-			derivaExpNum();
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token)) {
-				lexicon.storeToken(token);
-				derivaFExpNum();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 				return;
 			}
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df', ';', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FEXPNUM3");	
+		} catch (Exception e) {}
+	}
+
+	// -> EXPNUM FEXPNUM						
+	private void derivationFLPar() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+				lexicon.storeToken(token);
+				derivationExpNum();
+				derivationFExpNum();
+				return;
+			}
+			errors.addErro("Espera [ '(|ID|n. inteiro|n. float' ]", token.getLexeme(), token.getLin(), token.getCol(), "FLPAR");
+		} catch (Exception e) {}
 	}
 	
-	public void derivaFExpNum() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token)) {
-			token = lexicon.nextToken();
+	// -> r_par FRPAR						
+	private void derivationFExpNum() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token))
+				errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "FEXPNUM");
+			derivationFRPar();
+		} catch (Exception e) {}
+	}
+	
+	// -> relop EXPNUM | ε						
+	private void derivationFRPar() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
 			if (FirstFollow.getInstance().isInFirst(NonTerm.FRPAR, token)) {
-				lexicon.storeToken(token);
-				derivaFRPar();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				derivationExpNum();	
 				return;
 			}
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-	}
-	
-	public void derivaFRPar() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FRPAR, token)) {
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FRPAR, token)) {
 				lexicon.storeToken(token);
-				derivaExpNum();	
-				token = lexicon.nextToken();			
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 				return;
 			}
-		} else if (FirstFollow.getInstance().isInFollow(NonTerm.FRPAR, token)) {
-			token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df', ';', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FRPAR");
+		} catch (Exception e) {}
 	}
-	
+
+	// -> relop EXPNUM
 	// -> FVALLOG | OPNUM EXPNUM relop EXPNUM						
-	public void derivaFId1() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
-			lexicon.storeToken(token);
-			derivaFValLog();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaOpNum();
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
-				lexicon.storeToken(token);			
-				derivaExpNum();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	private void derivationFId1() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (token.getType().equals(TokenType.RELOP)) {
+				derivationExpNum();
+				return;
 			}
-			if (token.getType() == TokenType.RELOP) {
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			}
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
 				lexicon.storeToken(token);
-				derivaExpNum();
-				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				derivationFValLog();
+				return;
 			}
-			return;
-		}
-		if (token.getType() == TokenType.RELOP) {
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 				lexicon.storeToken(token);
-				derivaExpNum();
-				// token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				derivationOpNum();
+				derivationExpNum();
+				token = lexicon.nextToken();
+				if (!token.getType().equals(TokenType.RELOP))
+					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "FID1");
+				derivationExpNum();
+				return;
 			}
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df', 'and|not|or', '+|-|/|*' ]", token.getLexeme(), token.getLin(), token.getCol(), "FID1");
+		} catch (Exception e) {}
 	}
 	
 	// -> logic_op EXPLO | ε						
-	public void derivaFValLog() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
-			derivaExpLo();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFollow(NonTerm.FVALLOG, token)) {
-			lexicon.storeToken(token);
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	private void derivationFValLog() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
+				derivationExpLo();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFollow(NonTerm.FVALLOG, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ 'and|not|or', ';|)', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "FVALLOG");
+		} catch (Exception e) {}
 	}
 	
-	public void derivaXExpNum() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
-			lexicon.storeToken(token);
-			derivaOpNum();
-			token = lexicon.nextToken();
-			if (FirstFollow.getInstance().isInFirst(NonTerm.EXPNUM, token)) {
+	// -> OPNUM EXPNUM | ε						
+	private void derivationXExpNum() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
 				lexicon.storeToken(token);
-				derivaExpNum();
-				// token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				derivationOpNum();
+				derivationExpNum();
+				return;
 			}
-			return;
-		} else if (FirstFollow.getInstance().isInFollow(NonTerm.XEXPNUM, token)) {
-			lexicon.storeToken(token);
-			// token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (FirstFollow.getInstance().isInFollow(NonTerm.XEXPNUM, token)) {
+				lexicon.storeToken(token);
+				return;
+			}
+			errors.addErro("Espera [ '+|-|/|*', '$lt|$gt|$ge|$le|$eq|$df|to|begin|declare|if|ID|for|while|;|)', 'ε' ]", token.getLexeme(), token.getLin(), token.getCol(), "XEXPNUM");	
+		} catch (Exception e) {}
 	}
 	
 	// -> arit_as | arit_md						
-	public void derivaOpNum() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token)) {
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());		
+	private void derivationOpNum() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!FirstFollow.getInstance().isInFirst(NonTerm.OPNUM, token))
+				errors.addErro("Espera [ '+|-|/|*' ]", token.getLexeme(), token.getLin(), token.getCol(), "OPNUM");
+		} catch (Exception e) {}
 	}
 	
-	public void derivaVal() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.VAL, token)) {
-			// token = lexicon.nextToken();
-			// lexicon.storeToken(token);
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+	// -> id | num_int | num_float						
+	private void derivationVal() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!FirstFollow.getInstance().isInFirst(NonTerm.VAL, token))
+				errors.addErro("Espera [ 'ID|n. inteiro|n. float' ]", token.getLexeme(), token.getLin(), token.getCol(), "VAL");
+			verifyIfIdDeclared(token, false);
+		} catch (Exception e) {}
 	}
 	
 	//  -> REPF | REPW						
-	public void derivaRep() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.REPF, token)) {
-			derivaRepF();
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.REPW, token)) {
-			derivaRepW();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+	private void derivationRep() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.REPF, token)) {
+				derivationRepF();
+				return;
+			}
+			if (FirstFollow.getInstance().isInFirst(NonTerm.REPW, token)) {
+				derivationRepW();
+				return;
+			}
+			errors.addErro("Espera [ 'for|while' ]", token.getLexeme(), token.getLin(), token.getCol(), "REP");
+		} catch (Exception e) {}
 	}
 	
-	//  -> for id attrib EXPNUM to EXPNUM BLOCO						
-	public void derivaRepF() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.ID)) {
+	// -> for id attrib EXPNUM to EXPNUM BLOCO						
+	private void derivationRepF() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.ID))
+				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "REPF");
+			verifyIfIdDeclared(token, false);
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType().equals(TokenType.ASSIGN)) {
-			derivaExpNum();
+			if (!token.getType().equals(TokenType.ASSIGN))
+				errors.addErro("Espera '<-'", token.getLexeme(), token.getLin(), token.getCol(), "REPF");
+			derivationExpNum();
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR 
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-		}
-		if (token.getType().equals(TokenType.TO)) {
-			derivaExpNum();
-			derivaBloco();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (!token.getType().equals(TokenType.TO))
+				errors.addErro("Espera 'to'", token.getLexeme(), token.getLin(), token.getCol(), "REPF");
+			derivationExpNum();
+			derivationBloco();
+		} catch (Exception e) {}
 	}
 	
 	// -> VAL XEXPNUM | l_par EXPNUM r_par	
-	public void derivaExpNum() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.VAL, token)) {
-			lexicon.storeToken(token);
-			derivaVal();
-			derivaXExpNum();
-			return;
-		}
-		if (token.getType().equals(TokenType.L_PAR)) {
-			derivaExpNum();
-			token = lexicon.nextToken();
-			if (token.getType().equals(TokenType.R_PAR)) {
+	private void derivationExpNum() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (FirstFollow.getInstance().isInFirst(NonTerm.VAL, token)) {
+				lexicon.storeToken(token);
+				derivationVal();
+				derivationXExpNum();
 				return;
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			}
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (token.getType().equals(TokenType.L_PAR)) {
+				derivationExpNum();
+				token = lexicon.nextToken();
+				if (!token.getType().equals(TokenType.R_PAR))
+					errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "EXPNUM");
+				return;
+			}
+			errors.addErro("Espera [ 'ID|n. inteiro|n. float', '(' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPNUM");
+		} catch (Exception e) {}
 	}
 	
-	public void derivaRepW() throws IOException {
-		Token token = lexicon.nextToken();
-		if (FirstFollow.getInstance().isInFirst(NonTerm.REPW, token)) {
+	// -> while l_par EXPLO r_par BLOCO						
+	private void derivationRepW() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (!token.getType().equals(TokenType.L_PAR))
+				errors.addErro("Espera '('", token.getLexeme(), token.getLin(), token.getCol(), "REPW");
+			derivationExpLo();
 			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-		if (token.getType() == TokenType.L_PAR) {
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.EXPLO, token)) {
-				lexicon.storeToken(token);
-				derivaExpLo();
-				token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-		if (token.getType() == TokenType.R_PAR) {
-			token = lexicon.nextToken();
-		} else {
-			// TENTAR SE RECUPERAR
-			errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.BLOCO, token)) {
-			lexicon.storeToken(token);
-			derivaBloco();
-			token = lexicon.nextToken();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());	
+			if (!token.getType().equals(TokenType.R_PAR))
+				errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "REPW");
+			derivationBloco();
+		} catch (Exception e) {}
 	}
 	
 	// -> logic_val FVALLOG | id FID_1 | num_int OPNUM EXPNUM relop EXPNUM | num_float OPNUM EXPNUM relop EXPNUM | l_par EXPNUM r_par relop EXPNUM						
-	public void derivaExpLo() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.LOGIC_VAL)) {
-			derivaFValLog();
-			return;
-		}
-		if (token.getType().equals(TokenType.ID)) {
-			derivaFId1();
-			return;
-		}
-		if (token.getType().equals(TokenType.NUM_INT)) {
-			derivaOpNum();
-			derivaExpNum();
-			token = lexicon.nextToken();
-			if (token.getType().equals(TokenType.RELOP)) {
-				derivaExpNum();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+	private void derivationExpLo() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (token.getType().equals(TokenType.LOGIC_VAL)) {
+				derivationFValLog();
+				return;
 			}
-			return;
-		} 
-		if (token.getType().equals(TokenType.NUM_FLOAT)) {
-			derivaOpNum();
-			derivaExpNum();
-			token = lexicon.nextToken();
-			if (token.getType().equals(TokenType.RELOP)) {
-				derivaExpNum();
+			if (token.getType().equals(TokenType.ID)) {
+				verifyIfIdDeclared(token, false);
+				derivationFId1();
+				return;
+			}
+			if (token.getType().equals(TokenType.NUM_INT)) {
+				derivationOpNum();
+				derivationExpNum();
 				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
-			}
-			return;
-		}
-		if (token.getType().equals(TokenType.L_PAR)) {
-			derivaExpNum();
-			token = lexicon.nextToken();
-			if (token.getType().equals(TokenType.R_PAR)) {
+				if (!token.getType().equals(TokenType.RELOP))
+					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+				derivationExpNum();
+				return;
+			} 
+			if (token.getType().equals(TokenType.NUM_FLOAT)) {
+				derivationOpNum();
+				derivationExpNum();
 				token = lexicon.nextToken();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+				if (!token.getType().equals(TokenType.RELOP))
+					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+				derivationExpNum();
+				return;
 			}
-			if (token.getType().equals(TokenType.RELOP)) {
-				derivaExpNum();
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (token.getType().equals(TokenType.L_PAR)) {
+				derivationExpNum();
+				token = lexicon.nextToken();
+				if (!token.getType().equals(TokenType.R_PAR))
+					errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+				token = lexicon.nextToken();	
+				if (!token.getType().equals(TokenType.RELOP))
+					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+				derivationExpNum();
+				return;
 			}
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol()); 
+			errors.addErro("Espera [ 'true|false', 'ID', 'n. inteiro', 'n. float', '(' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+		} catch (Exception e) {}
 	}
 
-	// -> begin CMDS end | CMD						
-	public void derivaBloco() throws IOException {
-		Token token = lexicon.nextToken();
-		if (token.getType().equals(TokenType.BEGIN)) {
-			derivaCmds();
-			token = lexicon.nextToken();
-			if (token.getType().equals(TokenType.END)) {
+	// -> begin CMDS end | CMD					
+	private void derivationBloco() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			if (token.getType().equals(TokenType.BEGIN)) {
+				derivationCmds();
+				token = lexicon.nextToken();
+				if (!token.getType().equals(TokenType.END))
+					errors.addErro("Espera 'end'", token.getLexeme(), token.getLin(), token.getCol(), "BLOCO");
 				return;
-			} else {
-				// TENTAR SE RECUPERAR
-				errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
 			}
-			return;
-		}
-		if (FirstFollow.getInstance().isInFirst(NonTerm.CMD, token)) {
-			lexicon.storeToken(token);
-			derivaCmd();
-			return;
-		}
-		// TENTAR SE RECUPERAR
-		errors.addErro("Comando invalido", token.getLexeme(), token.getLin(), token.getCol());
+			if (FirstFollow.getInstance().isInFirst(NonTerm.CMD, token)) {
+				lexicon.storeToken(token);
+				derivationCmd();
+				return;
+			}
+			// TENTAR SE RECUPERAR
+			errors.addErro("Espera [ 'begin|declare|if|ID|for|while' ]", token.getLexeme(), token.getLin(), token.getCol(), "BLOCO");
+		} catch (Exception e) {}
 	}
 }

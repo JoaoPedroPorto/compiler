@@ -121,7 +121,7 @@ public class Lexicon {
 					break;
 				}
 				lexeme.append(character);
-				errors.addErro("Caracter invalido: ", lexeme.toString(), line, column);
+				errors.addErro("Caracter invalido: ", lexeme.toString(), line, column, "");
 				this.nextToken();
 		}
 		return token;
@@ -130,7 +130,7 @@ public class Lexicon {
 	private Token processLiteral() throws IOException {
 		try {
 			if (character == '\'') {
-				errors.addErro("Erro Literal: Caractere ' \' ' nao e aceito para literal.", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal: Caractere ' \' ' nao e aceito para literal.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 			do {
@@ -139,12 +139,12 @@ public class Lexicon {
 			} while(character != '\"');
 			lexeme.append(character);
 			if (character != '\"') {
-				errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		} catch (EOFException e) {
 			if (character != '\"' || lexeme.toString().length() == 1) {
-				errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal: Faltando fechar aspas com '\"'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		}
@@ -165,13 +165,13 @@ public class Lexicon {
 				fLoader.resetLastChar();
 			} else if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_' && !Character.isWhitespace(character)) {
 				lexeme.append(character);
-				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
+				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		} catch (EOFException e) {
 			if (!Character.isLetter(character) && !Character.isDigit(character) && character != '_') {
 				lexeme.append(character);
-				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
+				errors.addErro("Erro validacao Id: Nao e possivel gerar um id com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		}
@@ -191,7 +191,7 @@ public class Lexicon {
 				character = fLoader.getNextChar();
 				if (!Character.isDigit(character)) {
 					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' depois do '.'", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico Decimal: Espera 'digito' depois do '.'", lexeme.toString(), line, column, "");
 					return this.nextToken();
 				}
 				while (Character.isDigit(character)) {
@@ -204,14 +204,14 @@ public class Lexicon {
 				character = fLoader.getNextChar();
 				if (character != '-' && character != '+') {
 					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico: Espera ['-', '+'] depois do ['E', 'e']", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico: Espera ['-', '+'] depois do ['E', 'e']", lexeme.toString(), line, column, "");
 					return this.nextToken();
 				}
 				lexeme.append(character);
 				character = fLoader.getNextChar();
 				if (!Character.isDigit(character)) {
 					lexeme.append(character);
-					errors.addErro("Erro Literal Numerico: Espera 'digito' depois do ['-', '+']", lexeme.toString(), line, column);
+					errors.addErro("Erro Literal Numerico: Espera 'digito' depois do ['-', '+']", lexeme.toString(), line, column, "");
 					return this.nextToken();
 				}
 				while (Character.isDigit(character)) {
@@ -223,14 +223,14 @@ public class Lexicon {
 				fLoader.resetLastChar();
 			} else if (Character.isLetter(character)) {
 				lexeme.append(character);
-				errors.addErro("Erro Literal Numerico: Caractere '" + character + "' nao e valido", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal Numerico: Caractere '" + character + "' nao e valido", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		} catch (EOFException e) {
 			try {
 				Double.parseDouble(lexeme.toString());
 			} catch (Exception e1) {
-				errors.addErro("Erro Literal Numerico: Nao e possivel gerar um numero com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column);
+				errors.addErro("Erro Literal Numerico: Nao e possivel gerar um numero com a seguinte sequencia '" + lexeme.toString() + "'", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		}
@@ -243,12 +243,12 @@ public class Lexicon {
 			character = fLoader.getNextChar();
 			if (character != '-') {
 				lexeme.append(character);
-				errors.addErro("Erro Atribuicao: Espera '-' no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Atribuicao: Espera '-' no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		} catch (Exception e) {
 			if (lexeme.toString().length() != 2) {
-				errors.addErro("Erro Atribuicao: Sequencia de caracteres nao formam uma atribuicao.", lexeme.toString(), line, column);
+				errors.addErro("Erro Atribuicao: Sequencia de caracteres nao formam uma atribuicao.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		}
@@ -262,33 +262,33 @@ public class Lexicon {
 			character = fLoader.getNextChar();
 			if (character != 'l' && character != 'g' && character != 'e' && character != 'd') {
 				lexeme.append(character);
-				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g', 'e', 'd' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g', 'e', 'd' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 			lexeme.append(character);
 			character = fLoader.getNextChar();
 			if (character != 't' && character != 'e' && character != 'q' && character != 'f') {
 				lexeme.append(character);
-				errors.addErro("Erro Operador Logico: Espera [ 't', 'e', 'q', 'f' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 't', 'e', 'q', 'f' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 			if ((character == 't' || character == 'e')
 					&& (lexeme.charAt(lexeme.length() - 1) != 'l' && lexeme.charAt(lexeme.length() - 1) != 'g')) {
 				lexeme.append(character);
-				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 'l', 'g' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			} else if (character == 'q' && lexeme.charAt(lexeme.length() - 1) != 'e') {
 				lexeme.append(character);
-				errors.addErro("Erro Operador Logico: Espera [ 'e' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 'e' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			} else if (character == 'f' && lexeme.charAt(lexeme.length() - 1) != 'd') {
 				lexeme.append(character);
-				errors.addErro("Erro Operador Logico: Espera [ 'd' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Espera [ 'd' ] no lugar de '" + lexeme.toString() + "'.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		} catch (EOFException e) {
 			if (lexeme.toString().length() != 3) {
-				errors.addErro("Erro Operador Logico: Caracteres informados nao forma um operador valido.", lexeme.toString(), line, column);
+				errors.addErro("Erro Operador Logico: Caracteres informados nao forma um operador valido.", lexeme.toString(), line, column, "");
 				return this.nextToken();
 			}
 		}
@@ -307,7 +307,7 @@ public class Lexicon {
 			character = fLoader.getNextChar();
 			if (character != '#') {
 				lexeme.append(character);
-				errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column);
+				errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column, "");
 				return;
 			}
 			do {
@@ -317,11 +317,11 @@ public class Lexicon {
 			lexeme.append(character);
 			character = fLoader.getNextChar();
 			if (character != '}') {
-				errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column);
+				errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column, "");
 				return;
 			}
 		} catch (EOFException e) {
-			errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column);
+			errors.addErro("Erro Comentario: Espera {# comentario #}.", lexeme.toString(), line, column, "");
 		}
 	}
 
