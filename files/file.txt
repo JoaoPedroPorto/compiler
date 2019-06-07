@@ -1,4 +1,4 @@
-program TESTE_01;
+program;
 
     begin
 

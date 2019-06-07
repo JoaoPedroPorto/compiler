@@ -91,15 +91,22 @@ public class Syntactic {
 		try {
 			boolean hasError = false;
 			Token token = lexicon.nextToken();
-			if (!FirstFollow.getInstance().isInFirst(NonTerm.S, token))
+			if (!FirstFollow.getInstance().isInFirst(NonTerm.S, token)) {
 				errors.addErro("Espera 'program'", token.getLexeme(), token.getLin(), token.getCol(), "S");
+				if (token.getType().equals(TokenType.TERM))
+					lexicon.storeToken(token);
+			}
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.ID))
+			if (!token.getType().equals(TokenType.ID)) {
 				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "S");
+				if (token.getType().equals(TokenType.TERM))
+					lexicon.storeToken(token);
+			}
 			token = lexicon.nextToken();
 			if (!token.getType().equals(TokenType.TERM)) {
 				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "S");
-				if (!FirstFollow.getInstance().isInFirst(NonTerm.CMD, token) && !token.getType().equals(TokenType.BEGIN)) {
+				if (!token.getType().equals(TokenType.TERM)) {
+					lexicon.storeToken(token);
 					reSyncS();
 					token = lexicon.nextToken();
 				}
