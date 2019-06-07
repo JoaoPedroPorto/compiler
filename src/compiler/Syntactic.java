@@ -301,6 +301,7 @@ public class Syntactic {
 		try {
 			Token token = lexicon.nextToken();
 			if (FirstFollow.getInstance().isInFirst(NonTerm.FVALLOG, token)) {
+				lexicon.storeToken(token);
 				derivationFValLog();
 				return;
 			}
@@ -344,7 +345,8 @@ public class Syntactic {
 		} catch (Exception e) {}
 	}
 	
-	// -> OPNUM FOPNUM_1						
+	// -> OPNUM FOPNUM_1
+	// -> ε						
 	private void derivationFNumInt() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
@@ -392,7 +394,8 @@ public class Syntactic {
 		} catch (Exception e) {}
 	}
 	
-	// -> OPNUM FOPNUM_2											
+	// -> OPNUM FOPNUM_2	
+	// -> ε
 	private void derivationFNumFloat() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
