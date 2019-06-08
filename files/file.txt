@@ -1,4 +1,4 @@
-program;
+program TESTE_01;
 
     begin
 
@@ -13,8 +13,7 @@ program;
         declare var_5 bool;
 
         declare var_6 float;
-
-                
+        
         var_1 <- 10;
 
         var_2 <- var_1 + 100;
@@ -23,7 +22,12 @@ program;
 
         var_5 <- false;
 
-        
+        while(var_1 $lt 100) 
+        	begin
+        	
+        		var_1 <- var_1 + 10;
+        	
+        	end 
 
         if (var_1 $gt var_2) then
 

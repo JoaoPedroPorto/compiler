@@ -1,5 +1,18 @@
 package compiler;
 
+/*
+ * 
+ * Arabianos
+ * 
+ * Rafaela Penteado da Cunha
+ * João Pedro Porto
+ * Diego Fortunato
+ * Ulisses Maia
+ * João Matos
+ * Daniel Dos Anjos Barros
+ *
+ */
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

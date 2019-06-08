@@ -54,28 +54,6 @@ public class Syntactic {
 		ErrorHandler.getInstance().errorReport();
 	}
 	
-	/*private void reSyncFollow(NonTerm nt) {
-		try {
-			Token token = null;
-			do {
-				token = lexicon.nextToken();
-			} while (!FirstFollow.getInstance().isInFollow(nt, token));
-			lexicon.storeToken(token);
-		} catch (IOException e) {
-		}
-	}
-	
-	private void reSyncFirst(NonTerm nt) {
-		try {
-			Token token = null;
-			do {
-				token = lexicon.nextToken();
-			} while (!FirstFollow.getInstance().isInFirst(nt, token));
-			lexicon.storeToken(token);
-		} catch (IOException e) {
-		}
-	}*/
-	
 	private void reSyncS() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
@@ -102,6 +80,7 @@ public class Syntactic {
 				if (token.getType().equals(TokenType.TERM))
 					lexicon.storeToken(token);
 			}
+			verifyIfIdDeclared(token, true);
 			token = lexicon.nextToken();
 			if (!token.getType().equals(TokenType.TERM)) {
 				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "S");
@@ -191,16 +170,34 @@ public class Syntactic {
 		} catch (Exception e) {}
 	}
 	
+	private void reSyncAtrib() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			while ((!FirstFollow.getInstance().isInFollow(NonTerm.CMDS, token) && !FirstFollow.getInstance().isInFirst(NonTerm.CMDS, token)) || token.getType().equals(TokenType.EOF)) {
+				token = lexicon.nextToken();
+			}
+			lexicon.storeToken(token);
+		} catch (Exception e) {}
+	}
+	
 	//  -> id assign EXP term						
 	private void derivationAtrib() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.ASSIGN))
+			if (!token.getType().equals(TokenType.ASSIGN)) {
 				errors.addErro("Espera '<-'", token.getLexeme(), token.getLin(), token.getCol(), "ATRIB");
+				lexicon.storeToken(token);
+				reSyncAtrib();
+				return;
+			}
 			derivationExp();
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.TERM))
+			if (!token.getType().equals(TokenType.TERM)) {
 				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "ATRIB");
+				lexicon.storeToken(token);
+				reSyncAtrib();
+				return;
+			}
 		} catch (Exception e) {}
 	}
 	
@@ -221,19 +218,41 @@ public class Syntactic {
 		} catch (Exception e) {}
 	}
 	
+	private void reSyncDecl() throws IOException {
+		try {
+			Token token = lexicon.nextToken();
+			while ((!FirstFollow.getInstance().isInFollow(NonTerm.CMDS, token) && !FirstFollow.getInstance().isInFirst(NonTerm.CMDS, token)) || token.getType().equals(TokenType.EOF)) {
+				token = lexicon.nextToken();
+			}
+			lexicon.storeToken(token);
+		} catch (Exception e) {}
+	}
+	
 	// -> declare id type term						
 	private void derivationDecl() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.ID))
+			if (!token.getType().equals(TokenType.ID)) {
 				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+				lexicon.storeToken(token);
+				reSyncDecl();
+				return;
+			}
 			verifyIfIdDeclared(token, true);
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.TYPE))
+			if (!token.getType().equals(TokenType.TYPE)) {
 				errors.addErro("Espera [ 'bool|text|int|float' ]", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+				lexicon.storeToken(token);
+				reSyncDecl();
+				return;				
+			}
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.TERM))
+			if (!token.getType().equals(TokenType.TERM)) {
 				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "DECL");
+				lexicon.storeToken(token);
+				reSyncDecl();
+				return;
+			}
 		} catch (Exception e) {}
 	}
 	
