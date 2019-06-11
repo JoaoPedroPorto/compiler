@@ -71,13 +71,17 @@ public class Syntactic {
 			Token token = lexicon.nextToken();
 			if (!FirstFollow.getInstance().isInFirst(NonTerm.S, token)) {
 				errors.addErro("Espera 'program'", token.getLexeme(), token.getLin(), token.getCol(), "S");
-				if (token.getType().equals(TokenType.TERM))
+				if (token.getType().equals(TokenType.EOF))
+					return;
+				else if (token.getType().equals(TokenType.TERM))
 					lexicon.storeToken(token);
 			}
 			token = lexicon.nextToken();
 			if (!token.getType().equals(TokenType.ID)) {
 				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "S");
-				if (token.getType().equals(TokenType.TERM))
+				if (token.getType().equals(TokenType.EOF))
+					return;
+				else if (token.getType().equals(TokenType.TERM))
 					lexicon.storeToken(token);
 			}
 			verifyIfIdDeclared(token, true);
@@ -98,11 +102,17 @@ public class Syntactic {
 			if (!hasError)
 				derivationBloco();
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.END_PROG))
+			if (!token.getType().equals(TokenType.END_PROG)) {
 				errors.addErro("Espera 'end_prog'", token.getLexeme(), token.getLin(), token.getCol(), "S");
+				if (token.getType().equals(TokenType.EOF))
+					return;
+			}
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.TERM))
+			if (!token.getType().equals(TokenType.TERM)) {
 				errors.addErro("Espera ';'", token.getLexeme(), token.getLin(), token.getCol(), "S");	
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 		} catch (Exception e) {}
 	}
 
@@ -260,15 +270,24 @@ public class Syntactic {
 	private void derivationCond() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.L_PAR))
+			if (!token.getType().equals(TokenType.L_PAR)) {
 				errors.addErro("Espera '('", token.getLexeme(), token.getLin(), token.getCol(), "COND");
+				if (token.getType().equals(TokenType.EOF))
+					return;
+			}
 			derivationExpLo();
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.R_PAR))
+			if (!token.getType().equals(TokenType.R_PAR)) {
 				errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "COND");
+				if (token.getType().equals(TokenType.EOF))
+					return;
+			}
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.THEN))
+			if (!token.getType().equals(TokenType.THEN)) {
 				errors.addErro("Espera 'then'", token.getLexeme(), token.getLin(), token.getCol(), "COND");
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 			derivationBloco();
 			derivationCndb();
 		} catch (Exception e) {}
@@ -487,8 +506,11 @@ public class Syntactic {
 	private void derivationFExpNum() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
-			if (!FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token))
+			if (!FirstFollow.getInstance().isInFirst(NonTerm.FEXPNUM, token)) {
 				errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "FEXPNUM");
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 			derivationFRPar();
 		} catch (Exception e) {}
 	}
@@ -528,8 +550,11 @@ public class Syntactic {
 				derivationOpNum();
 				derivationExpNum();
 				token = lexicon.nextToken();
-				if (!token.getType().equals(TokenType.RELOP))
+				if (!token.getType().equals(TokenType.RELOP)) {
 					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "FID1");
+					if (token.getType().equals(TokenType.EOF))
+						return;					
+				}
 				derivationExpNum();
 				return;
 			}
@@ -614,12 +639,18 @@ public class Syntactic {
 				errors.addErro("Espera 'ID'", token.getLexeme(), token.getLin(), token.getCol(), "REPF");
 			verifyIfIdDeclared(token, false);
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.ASSIGN))
+			if (!token.getType().equals(TokenType.ASSIGN)) {
 				errors.addErro("Espera '<-'", token.getLexeme(), token.getLin(), token.getCol(), "REPF");
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 			derivationExpNum();
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.TO))
+			if (!token.getType().equals(TokenType.TO)) {
 				errors.addErro("Espera 'to'", token.getLexeme(), token.getLin(), token.getCol(), "REPF");
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 			derivationExpNum();
 			derivationBloco();
 		} catch (Exception e) {}
@@ -650,12 +681,18 @@ public class Syntactic {
 	private void derivationRepW() throws IOException {
 		try {
 			Token token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.L_PAR))
+			if (!token.getType().equals(TokenType.L_PAR)) {
 				errors.addErro("Espera '('", token.getLexeme(), token.getLin(), token.getCol(), "REPW");
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 			derivationExpLo();
 			token = lexicon.nextToken();
-			if (!token.getType().equals(TokenType.R_PAR))
+			if (!token.getType().equals(TokenType.R_PAR)) {
 				errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "REPW");
+				if (token.getType().equals(TokenType.EOF))
+					return;				
+			}
 			derivationBloco();
 		} catch (Exception e) {}
 	}
@@ -677,8 +714,11 @@ public class Syntactic {
 				derivationOpNum();
 				derivationExpNum();
 				token = lexicon.nextToken();
-				if (!token.getType().equals(TokenType.RELOP))
+				if (!token.getType().equals(TokenType.RELOP)) {
 					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+					if (token.getType().equals(TokenType.EOF))
+						return;					
+				}
 				derivationExpNum();
 				return;
 			} 
@@ -686,19 +726,28 @@ public class Syntactic {
 				derivationOpNum();
 				derivationExpNum();
 				token = lexicon.nextToken();
-				if (!token.getType().equals(TokenType.RELOP))
+				if (!token.getType().equals(TokenType.RELOP)) {
 					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+					if (token.getType().equals(TokenType.EOF))
+						return;					
+				}
 				derivationExpNum();
 				return;
 			}
 			if (token.getType().equals(TokenType.L_PAR)) {
 				derivationExpNum();
 				token = lexicon.nextToken();
-				if (!token.getType().equals(TokenType.R_PAR))
+				if (!token.getType().equals(TokenType.R_PAR)) {
 					errors.addErro("Espera ')'", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+					if (token.getType().equals(TokenType.EOF))
+						return;					
+				}
 				token = lexicon.nextToken();	
-				if (!token.getType().equals(TokenType.RELOP))
+				if (!token.getType().equals(TokenType.RELOP)) {
 					errors.addErro("Espera [ '$lt|$gt|$ge|$le|$eq|$df' ]", token.getLexeme(), token.getLin(), token.getCol(), "EXPLO");
+					if (token.getType().equals(TokenType.EOF))
+						return;					
+				}
 				derivationExpNum();
 				return;
 			}
@@ -722,7 +771,6 @@ public class Syntactic {
 				derivationCmd();
 				return;
 			}
-			// TENTAR SE RECUPERAR
 			errors.addErro("Espera [ 'begin|declare|if|ID|for|while' ]", token.getLexeme(), token.getLin(), token.getCol(), "BLOCO");
 		} catch (Exception e) {}
 	}

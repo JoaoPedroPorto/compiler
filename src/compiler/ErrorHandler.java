@@ -44,7 +44,7 @@ public class ErrorHandler {
         System.out.println("\n\n-----------------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
         int i = 1;
         for (ErrorReport error : listErros) {
-        	System.out.format("%5s %15s %20s %100s %20s",i, "(" + error.getLine() + ", " + error.getColumn() + ")", error.getLexeme(), error.getDescription(), error.getType());
+        	System.out.format("%5s %15s %20s %100s %20s",i, "(" + error.getLine() + ", " + error.getColumn() + ")", (error.getLexeme() != null && !error.getLexeme().isEmpty()) ? error.getLexeme() : "Fim do arquivo", error.getDescription(), error.getType());
             System.out.println("\n\n#---------------------------------------------------------------------------------------------------------------------------------------------------------------------#\n");
             i++;
         }
